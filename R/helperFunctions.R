@@ -79,7 +79,7 @@ targetCellCorners <- function(alignedTargetCell,cellIndex,theta,cmcClassif,targe
   targetScanRows <- alignedTargetCell$cmcR.info$regionIndices[c(3)] + alignedTargetCell$cmcR.info$regionRows - 1
   targetScanCols <- alignedTargetCell$cmcR.info$regionIndices[c(1)] + alignedTargetCell$cmcR.info$regionCols - 1
 
-  rotatedMask <- cmcR:::rotateSurfaceMatrix(target$surface.matrix,theta)
+  rotatedMask <- rotateSurfaceMatrix(target$surface.matrix,theta)
 
   rowPad <- 0
   colPad <- 0
@@ -124,11 +124,11 @@ targetCellCorners <- function(alignedTargetCell,cellIndex,theta,cmcClassif,targe
 
   rotatedMask[targetScanRows[1]:targetScanRows[2],targetScanCols[1]:targetScanCols[2]] <- 100
 
-  rotatedMask <- cmcR:::rotateSurfaceMatrix_noCrop(rotatedMask,theta = -1*theta)
+  rotatedMask <- rotateSurfaceMatrix_noCrop(rotatedMask,theta = -1*theta)
   #make a copy that isn't going to have the target cell indices added so that we
   #know exactly how many rows/cols we need to translate everything to get back to
   #the original scan indices
-  rotatedMaskCopy <- rotatedMask#cmcR:::rotateSurfaceMatrix_noCrop(rotatedMaskCopy,theta = 0)#-1*(-30))
+  rotatedMaskCopy <- rotatedMask
 
   rotatedMaskCopy[rotatedMaskCopy == 100] <- NA
 
@@ -194,4 +194,53 @@ targetCellCorners <- function(alignedTargetCell,cellIndex,theta,cmcClassif,targe
 
   return(ret)
 
+}
+
+# helper function for x3pListPlot. Rotates a surface matrix, but doesn't crop
+# back to the original surface matrix's dimensions.
+rotateSurfaceMatrix_noCrop <- function(surfaceMat,
+                                       theta = 0,
+                                       interpolation = 0){
+  surfaceMatFake <- (surfaceMat*10^5) + 1 #scale and shift all non-NA pixels up 1 (meter)
+  # imFakeRotated <- :bilinearInterpolation(imFake,theta)
+  surfaceMatFakeRotated <- surfaceMatFake %>%
+    imager::as.cimg() %>%
+    imager::imrotate(angle = theta,
+                     interpolation = interpolation, #linear interpolation,
+                     boundary = 0) %>% #pad boundary with 0s (dirichlet condition)
+    as.matrix()
+
+  surfaceMatFakeRotated[surfaceMatFakeRotated == 0] <- NA
+  #shift all of the legitimate pixels back down by 1:
+  surfaceMatRotated <- (surfaceMatFakeRotated - 1)/(10^5)
+
+  return(surfaceMatRotated)
+}
+
+# @name rotateSurfaceMatrix
+#
+# @keywords internal
+# @importFrom rlang .data
+
+utils::globalVariables(".")
+
+rotateSurfaceMatrix <- function(surfaceMat,
+                                theta = 0,
+                                interpolation = 0){
+  surfaceMatFake <- (surfaceMat*10^5) + 1 #scale and shift all non-NA pixels up 1 (meter)
+  # imFakeRotated <- :bilinearInterpolation(imFake,theta)
+  surfaceMatFakeRotated <- surfaceMatFake %>%
+    imager::as.cimg() %>%
+    imager::imrotate(angle = theta,
+                     interpolation = interpolation, #linear interpolation,
+                     cx = floor(nrow(.)/2), #imager treats the rows as the "x" axis of an image
+                     cy = floor(ncol(.)/2),
+                     boundary = 0) %>% #pad boundary with 0s (dirichlet condition)
+    as.matrix()
+
+  surfaceMatFakeRotated[surfaceMatFakeRotated == 0] <- NA
+  #shift all of the legitimate pixels back down by 1:
+  surfaceMatRotated <- (surfaceMatFakeRotated - 1)/(10^5)
+
+  return(surfaceMatRotated)
 }
