@@ -1,4 +1,8 @@
-x3pComparisonPlot <- function(reference,target,x3pNames = c("x3p1","x3p2")){
+x3pComparisonPlot <- function(reference,
+                              target,
+                              plotNames = c("x3p1","x3p2","Element-wise Average","x3p1 diff.","x3p2 diff."),
+                              unit = "Norm.",
+                              cutoffThresh = 1){
 
   # for the life of me, I can't replicate what facet_wrap does to put everything
   # on the exact same color scale (limits and all) when I try to plot each
@@ -18,7 +22,7 @@ x3pComparisonPlot <- function(reference,target,x3pNames = c("x3p1","x3p2")){
   # the reference and target and give these to the values argument in each
   # ggplot scale_colour_gradientn call
   refTargCombined <- purrr::map2_dfr(.x = list(reference,target),
-                                     .y = x3pNames,
+                                     .y = plotNames[1:2],
                                      function(x3p,name){
 
                                        x3p$header.info$incrementX <- 1
@@ -58,12 +62,8 @@ x3pComparisonPlot <- function(reference,target,x3pNames = c("x3p1","x3p2")){
   # add to the df created above data on the pixelwise average between ref and
   # targ scans. alpha-blend pixels where the pixelwise difference is large.
   surfaceMat_df <- refTargAverage %>%
-    mutate(
-      # value = value - median(value,na.rm = TRUE),
-      # alpha = ifelse(valueDiff <= quantile(valueDiff,.5,na.rm = TRUE),1,0),
-      alpha = ifelse(valueDiff <= 1,1,0),
-      # alpha = scales::rescale(sqrt(valueDiff),to = c(1,0)),
-      x3pName = "Pixelwise Average") %>%
+    mutate(alpha = ifelse(valueDiff <= cutoffThresh,1,0),
+           x3pName = plotNames[3]) %>%
     select(-valueDiff)
 
   refTargCombined <- bind_rows(refTargCombined,
@@ -73,23 +73,12 @@ x3pComparisonPlot <- function(reference,target,x3pNames = c("x3p1","x3p2")){
   # and average scans. alpha-blend pixels
   surfaceMat_df <- reference %>%
     x3pToDF() %>%
-    mutate(
-      value = value,
-      # value = value - median(value,na.rm = TRUE)
-    ) %>%
     left_join(refTargAverage %>%
                 rename(aveValue = value),
               by = c("x","y")) %>%
-    mutate(
-      # value = value - median(value,na.rm = TRUE),
-      value = ifelse(is.na(aveValue),NA,value),
-      # valueDiff = abs(value - aveValue)
-    ) %>%
-    mutate(
-      # alpha = ifelse(valueDiff > quantile(valueDiff,.5,na.rm = TRUE),1,0),
-      alpha = ifelse(valueDiff > 1,1,0),
-      # alpha = scales::rescale(sqrt(valueDiff),to = c(0,1)),
-      x3pName = paste0(x3pNames[1]," diff")) %>%
+    mutate(value = ifelse(is.na(aveValue),NA,value)) %>%
+    mutate(alpha = ifelse(valueDiff > cutoffThresh,1,0),
+           x3pName = plotNames[4]) %>%
     select(-c(valueDiff,aveValue))
 
   refTargCombined <- bind_rows(refTargCombined,
@@ -97,23 +86,13 @@ x3pComparisonPlot <- function(reference,target,x3pNames = c("x3p1","x3p2")){
 
   surfaceMat_df <- target %>%
     x3pToDF() %>%
-    mutate(
-      # value = value - median(value,na.rm = TRUE)
-    ) %>%
     left_join(
       refTargAverage %>%
         rename(aveValue = value),
       by = c("x","y")) %>%
-    mutate(
-      # value = value - median(value,na.rm = TRUE),
-      value = ifelse(is.na(aveValue),NA,value),
-      # valueDiff = abs(value - aveValue)
-    ) %>%
-    mutate(
-      # alpha = ifelse(valueDiff > quantile(valueDiff,.5,na.rm = TRUE),1,0),
-      alpha = ifelse(valueDiff > 1,1,0),
-      #alpha = scales::rescale(sqrt(valueDiff),to = c(0,1)),
-      x3pName = paste0(x3pNames[2]," diff")) %>%
+    mutate(value = ifelse(is.na(aveValue),NA,value)) %>%
+    mutate(alpha = ifelse(valueDiff > cutoffThresh,1,0),
+           x3pName = plotNames[5]) %>%
     select(-c(valueDiff,aveValue))
 
   refTargCombined <- bind_rows(refTargCombined,
@@ -121,7 +100,7 @@ x3pComparisonPlot <- function(reference,target,x3pNames = c("x3p1","x3p2")){
 
 
   x3pPlt <- refTargCombined %>%
-    mutate(x3pName = factor(x3pName,levels = c(x3pNames,"Pixelwise Average",paste0(x3pNames," diff")))) %>%
+    mutate(x3pName = factor(x3pName,levels = plotNames)) %>%
     ggplot(aes(x=x,y=y)) +
     # geom_raster(fill = "gray80") +
     geom_raster(aes(fill=value,alpha = alpha)) +
@@ -138,7 +117,8 @@ x3pComparisonPlot <- function(reference,target,x3pNames = c("x3p1","x3p2")){
                                   oob = scales::oob_keep,
                                   limits = range(refTargCombined$value),
                                   na.value = "gray65") +
-    labs(fill = expression("Rel. Height [Norm.]")) +
+    # labs(fill = expression("Rel. Height [Norm.]")) +
+    labs(fill = paste0("Rel. Height [",unit,"]")) +
     ggplot2::guides(fill = ggplot2::guide_colourbar(barheight = grid::unit(3,"in"),
                                                     label.theme = ggplot2::element_text(size = 8),
                                                     title.theme = ggplot2::element_text(size = 10),
@@ -146,7 +126,8 @@ x3pComparisonPlot <- function(reference,target,x3pNames = c("x3p1","x3p2")){
                                                     ticks.colour = "black"),
                     colour = 'none',
                     alpha = "none") +
-    facet_wrap(~ x3pName)
+    facet_wrap(~ x3pName) +
+    ggplot2::scale_alpha_identity()
 
   plt <- ggplot2::ggplot_build(x3pPlt)
 
@@ -155,7 +136,7 @@ x3pComparisonPlot <- function(reference,target,x3pNames = c("x3p1","x3p2")){
   ret <- plt$data[[1]] %>%
     group_by(PANEL) %>%
     group_split() %>%
-    map2(c(x3pNames,"Pixelwise Average",paste0(x3pNames," diff")),
+    map2(plotNames,
          function(dat,title){
 
            # dat_notGray <- dat %>%
@@ -169,7 +150,7 @@ x3pComparisonPlot <- function(reference,target,x3pNames = c("x3p1","x3p2")){
              theme_minimal() +
              theme(legend.position = "none") +
              scale_fill_identity() +
-             scale_alpha_identity() +
+             scale_alpha_identity(limits = c(0,1)) +
              ggplot2::coord_fixed(expand = FALSE) +
              ggplot2::theme_minimal() +
              ggplot2::theme(
@@ -190,7 +171,7 @@ x3pComparisonPlot <- function(reference,target,x3pNames = c("x3p1","x3p2")){
          })
 
   ret <- c(ret,list(pltLegend))  %>%
-    set_names(c(x3pNames,"Pixelwise Average",paste0(x3pNames," diff"),"legend"))
+    set_names(c(plotNames,"legend"))
 
   return(ret)
 
