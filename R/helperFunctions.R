@@ -175,20 +175,20 @@ targetCellCorners <- function(alignedTargetCell,cellIndex,theta,cmcClassif,targe
     as.data.frame() %>%
     mutate(xnew = y,
            ynew = x) %>%
-    select(-c(x,y)) %>%
-    rename(x=xnew,y=ynew) %>%
-    mutate(x = x - min(which(colSums(rotatedMaskCopy,na.rm = TRUE) > 0)),
+    dplyr::select(-c(x,y)) %>%
+    dplyr::rename(x=xnew,y=ynew) %>%
+    dplyr::mutate(x = x - min(which(colSums(rotatedMaskCopy,na.rm = TRUE) > 0)),
            # x = x - newColPad,
            y = y - min(which(rowSums(rotatedMaskCopy,na.rm = TRUE) > 0)),
            # y = y - newRowPad,
            # y = max(y) - y
            y = nrow(target$surface.matrix) - y
     ) %>%
-    filter(value == 100) %>%
-    select(-value) %>%
-    group_by(x,y) %>%
-    distinct() %>%
-    mutate(cellIndex = cellIndex,
+    dplyr::filter(value == 100) %>%
+    dplyr::select(-value) %>%
+    dplyr::group_by(x,y) %>%
+    dplyr::distinct() %>%
+    dplyr::mutate(cellIndex = cellIndex,
            theta = theta,
            cmcClassif = cmcClassif)
 

@@ -43,9 +43,7 @@ labelBlobs <- function(reference,target,filterCutoff = 1){
 
   labeledBlobMat %>%
     imager::as.cimg() %>%
-    as.data.frame() %>%
-    mutate(comparisonName = ..4,
-           cellIndex = ..3)
+    as.data.frame()
 
 }
 

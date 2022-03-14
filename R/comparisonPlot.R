@@ -110,7 +110,7 @@ x3pComparisonPlot <- function(reference,
                                     dat <- quantile(refTargCombined$value,c(0,.01,.25,.5,.75,.99,1),na.rm = TRUE)
 
                                     dat <- dat %>%
-                                      setNames(paste0(names(dat)," [",round(dat,1),"]"))
+                                      setNames(paste0(names(dat),"\n[",round(dat,1),"]"))
 
                                     return(dat)
                                   },
@@ -118,16 +118,17 @@ x3pComparisonPlot <- function(reference,
                                   limits = range(refTargCombined$value),
                                   na.value = "gray65") +
     # labs(fill = expression("Rel. Height [Norm.]")) +
-    labs(fill = paste0("Rel. Height [",unit,"]")) +
-    ggplot2::guides(fill = ggplot2::guide_colourbar(barheight = grid::unit(3,"in"),
-                                                    label.theme = ggplot2::element_text(size = 8),
-                                                    title.theme = ggplot2::element_text(size = 10),
+    labs(fill = paste0("Rel. Height\n[",unit,"]")) +
+    ggplot2::guides(fill = ggplot2::guide_colourbar(barwidth = grid::unit(2,"in"),
+                                                    label.theme = ggplot2::element_text(size = 6),
+                                                    title.theme = ggplot2::element_text(size = 8),
                                                     frame.colour = "black",
                                                     ticks.colour = "black"),
                     colour = 'none',
                     alpha = "none") +
     facet_wrap(~ x3pName) +
-    ggplot2::scale_alpha_identity()
+    ggplot2::scale_alpha_identity() +
+    ggplot2::theme(legend.direction = "horizontal")
 
   plt <- ggplot2::ggplot_build(x3pPlt)
 
@@ -148,12 +149,12 @@ x3pComparisonPlot <- function(reference,
                   aes(x=x,y=y)) +
              geom_raster(aes(fill=fill,alpha=alpha)) +
              theme_minimal() +
-             theme(legend.position = "none") +
              scale_fill_identity() +
              scale_alpha_identity(limits = c(0,1)) +
              ggplot2::coord_fixed(expand = FALSE) +
              ggplot2::theme_minimal() +
              ggplot2::theme(
+               legend.position = "none",
                axis.title.x = ggplot2::element_blank(),
                axis.text.x = ggplot2::element_blank(),
                axis.ticks.x = ggplot2::element_blank(),
@@ -163,7 +164,7 @@ x3pComparisonPlot <- function(reference,
                panel.grid.major = ggplot2::element_blank(),
                panel.grid.minor = ggplot2::element_blank(),
                panel.background = ggplot2::element_rect(fill = "gray80")
-               ,plot.title = element_text(size = 9,hjust = .5)
+               ,plot.title = element_text(size = 7,hjust = .5)
                # ,legend.position = "bottom"
              ) +
              labs(title = title)
