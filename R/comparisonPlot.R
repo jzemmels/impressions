@@ -64,7 +64,7 @@ x3pComparisonPlot <- function(reference,
   surfaceMat_df <- refTargAverage %>%
     mutate(alpha = ifelse(valueDiff <= cutoffThresh,1,0),
            x3pName = plotNames[3]) %>%
-    select(-valueDiff)
+    dplyr::select(-valueDiff)
 
   refTargCombined <- bind_rows(refTargCombined,
                                surfaceMat_df)
@@ -79,7 +79,7 @@ x3pComparisonPlot <- function(reference,
     mutate(value = ifelse(is.na(aveValue),NA,value)) %>%
     mutate(alpha = ifelse(valueDiff > cutoffThresh,1,0),
            x3pName = plotNames[4]) %>%
-    select(-c(valueDiff,aveValue))
+    dplyr::select(-c(valueDiff,aveValue))
 
   refTargCombined <- bind_rows(refTargCombined,
                                surfaceMat_df)
@@ -93,7 +93,7 @@ x3pComparisonPlot <- function(reference,
     mutate(value = ifelse(is.na(aveValue),NA,value)) %>%
     mutate(alpha = ifelse(valueDiff > cutoffThresh,1,0),
            x3pName = plotNames[5]) %>%
-    select(-c(valueDiff,aveValue))
+    dplyr::select(-c(valueDiff,aveValue))
 
   refTargCombined <- bind_rows(refTargCombined,
                                surfaceMat_df)
