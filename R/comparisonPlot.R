@@ -1,3 +1,5 @@
+#' @importFrom dplyr select
+#' @export
 x3pComparisonPlot <- function(reference,
                               target,
                               plotNames = c("x3p1","x3p2","Element-wise Average","x3p1 diff.","x3p2 diff."),
