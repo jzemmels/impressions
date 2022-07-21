@@ -128,7 +128,7 @@ targetCellCorners <- function(alignedTargetCell,cellIndex,theta,cmcClassif,targe
   #make a copy that isn't going to have the target cell indices added so that we
   #know exactly how many rows/cols we need to translate everything to get back to
   #the original scan indices
-  rotatedMaskCopy <- rotatedMask
+  rotatedMaskCopy <- rotatedMask#rotateSurfaceMatrix_noCrop(rotatedMaskCopy,theta = 0)#-1*(-30))
 
   rotatedMaskCopy[rotatedMaskCopy == 100] <- NA
 
@@ -173,24 +173,21 @@ targetCellCorners <- function(alignedTargetCell,cellIndex,theta,cmcClassif,targe
   ret <- rotatedMask %>%
     imager::as.cimg() %>%
     as.data.frame() %>%
-    mutate(xnew = y,
-           ynew = x) %>%
-    dplyr::select(-c(x,y)) %>%
-    dplyr::rename(x=xnew,y=ynew) %>%
-    dplyr::mutate(x = x - min(which(colSums(rotatedMaskCopy,na.rm = TRUE) > 0)),
-           # x = x - newColPad,
-           y = y - min(which(rowSums(rotatedMaskCopy,na.rm = TRUE) > 0)),
-           # y = y - newRowPad,
-           # y = max(y) - y
-           y = nrow(target$surface.matrix) - y
+    dplyr::mutate(xnew = .data$y,
+                  ynew = .data$x) %>%
+    dplyr::select(-c(.data$x,.data$y)) %>%
+    dplyr::rename(x=.data$xnew,y=.data$ynew) %>%
+    dplyr::mutate(x = .data$x - min(which(colSums(abs(rotatedMaskCopy),na.rm = TRUE) > 0)),
+                  y = .data$y - min(which(rowSums(abs(rotatedMaskCopy),na.rm = TRUE) > 0)),
+                  y = nrow(target$surface.matrix) - .data$y
     ) %>%
-    dplyr::filter(value == 100) %>%
-    dplyr::select(-value) %>%
-    dplyr::group_by(x,y) %>%
+    dplyr::filter(.data$value == 100) %>%
+    dplyr::select(-.data$value) %>%
+    dplyr::group_by(.data$x,.data$y) %>%
     dplyr::distinct() %>%
     dplyr::mutate(cellIndex = cellIndex,
-           theta = theta,
-           cmcClassif = cmcClassif)
+                  theta = theta,
+                  cmcClassif = cmcClassif)
 
   return(ret)
 
