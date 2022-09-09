@@ -2,6 +2,7 @@
 
 # this function is mainly intended to transform an x3p object to a data.frame
 # for easy ggplot-ing
+#' @export
 x3pToDF <- function(x3p,preserveResolution = FALSE){
 
   if(!preserveResolution){
@@ -23,55 +24,6 @@ x3pToDF <- function(x3p,preserveResolution = FALSE){
                   y=ynew)
 
   return(ret)
-}
-
-# combine a named list of x3ps into similarities, differences, or missing values
-
-# For type = "missing" returns an x3p object containing a surface matrix with
-# labeled pixels. The labels correspond to which x3p object has a missing value
-# in that pixel index.
-
-combineX3Ps <- function(x3p1,x3p2,
-                        x3pNames = c("x3p1","x3p2"),
-                        type = "difference",
-                        quantileThresh = .5){
-
-  stopifnot("Surface matrix dimensions should be equal" =
-              all(dim(x3p1$surface.matrix) == dim(x3p2$surface.matrix)))
-
-  #TODO: make this work with a list of > 2 x3ps
-  # if(is.null(x3pList)){
-  #   x3pList <- set_names(x3pList,paste0("x3p",1:length(x3pList)))
-  # }
-
-  if (type == "difference"){
-
-    difference <- x3p1
-
-    difference$surface.matrix <- x3p1$surface.matrix - x3p2$surface.matrix
-
-    return(difference)
-
-  }
-  if(type == "missing"){
-
-    missingVals <- x3p1
-
-    missingVals$surface.matrix <- matrix(NA,nrow = nrow(missingVals$surface.matrix),
-                                         ncol = ncol(missingVals$surface.matrix))
-
-    missingVals$surface.matrix[!is.na(x3p1$surface.matrix) & !is.na(x3p2$surface.matrix)] <- "Neither"
-
-    missingVals$surface.matrix[!is.na(x3p1$surface.matrix) & is.na(x3p2$surface.matrix)] <- x3pNames[1]
-
-    missingVals$surface.matrix[is.na(x3p1$surface.matrix) & !is.na(x3p2$surface.matrix)] <- x3pNames[2]
-
-    missingVals$surface.matrix[is.na(x3p1$surface.matrix) & is.na(x3p2$surface.matrix)] <- "Both"
-
-    return(missingVals)
-
-  }
-
 }
 
 targetCellCorners <- function(alignedTargetCell,cellIndex,theta,cmcClassif,target){

@@ -1,206 +1,85 @@
-labelBlobs <- function(reference,target,filterCutoff = 1){
-
-  # pixelwise average and absolute difference between the two scans
-  refTargAverage <- bind_rows(reference %>%
-                                x3pToDF() %>%
-                                mutate(value = value),
-                              target %>%
-                                x3pToDF() %>%
-                                mutate(value = value)) %>%
-    group_by(x,y) %>%
-    summarise(valueDiff = abs(diff(value)),
-              value = mean(value),
-              .groups = "drop")
-
-  # add to the df created above data on the pixelwise average between ref and
-  # targ scans. alpha-blend pixels where the pixelwise difference is large.
+# returns the filter boundary outlines in a data frame
+filterBoundaries <- function(averageBinarized){
 
   suppressWarnings({
 
-    averageMat <- refTargAverage %>%
-      mutate(value = ifelse(valueDiff <= filterCutoff,0,1),
-             x = x+1,
-             y=y+1) %>%
-      select(x,y,value) %>%
+    averageMat <- averageBinarized %>%
+      dplyr::mutate(x = x+1,
+                    y=y+1) %>%
+      as.data.frame() %>%
+      dplyr::select(x,y,value) %>%
       imager::as.cimg() %>%
       as.matrix()
 
   })
 
-  averageMatClone <- averageMat
-
   averageMat[is.na(averageMat)] <- 0
 
-  labeledBlobMat <- averageMat %>%
-    EBImage::as.Image() %>%
-    EBImage::bwlabel() %>%
-    as.array()
-
-  # put the NAs back in the image
-  labeledBlobMat[is.na(averageMatClone)] <- NA
-  # label the pixels that are not filtered out of the average df with -2
-  labeledBlobMat[averageMatClone == 0] <- -1
-
-  labeledBlobMat %>%
+  # we pad the matrix so that the contours one the edge blobs are properly
+  # identified. the padding is removed in the last lines of the creation of
+  # the outline object below
+  averageMat  <- averageMat %>%
     imager::as.cimg() %>%
-    as.data.frame()
+    imager::pad(nPix = 10,axes = "xy",val = 0)
+
+  labels <- imager::label(averageMat)
+
+  bounds <- purrr::map(unique(labels[labels > 0]),
+                       function(lab){
+
+                         imager::boundary(labels == lab)
+
+                       })
+
+  blobBoundaries <- list(bounds,labels)
+
+  # combine all labeled blobs into one image
+  boundaryPx <- Reduce("+",blobBoundaries[[1]] %>%
+                         purrr::map(as.matrix)) %>%
+    imager::as.cimg()
+
+  # the mask used to dilate the blobs will grow them towards the bottom-right of
+  # the matrix
+  dilatedPx <- imager::dilate_rect(boundaryPx,sx = 2,sy = 2)
+  dilatedPx_labels <- imager::dilate_rect(blobBoundaries[[1]][[2]],sx = 2,sy = 2)
+
+  # flip the image and re-apply the dilation to grow the borders to the other
+  # corners. flip back after dilation
+  dilatedPx_mirrorx <- imager::mirror(imager::dilate_rect(imager::mirror(boundaryPx,axis="x"),sx = 2,sy = 2),axis="x")
+  dilatedPx_mirrorx_labels <- imager::mirror(imager::dilate_rect(imager::mirror(blobBoundaries[[1]][[2]],axis="x"),sx = 2,sy = 2),axis="x")
+
+  dilatedPx_mirrory <- imager::mirror(imager::dilate_rect(imager::mirror(boundaryPx,axis="y"),sx = 2,sy = 2),"y")
+  dilatedPx_mirrory_labels <- imager::mirror(imager::dilate_rect(imager::mirror(blobBoundaries[[1]][[2]],axis="y"),sx = 2,sy = 2),"y")
+
+  dilatedPx_mirrorxy <- imager::mirror(imager::dilate_rect(imager::mirror(boundaryPx,axis="xy"),sx = 3,sy = 3),"xy")
+  dilatedPx_mirrorxy_labels <- imager::mirror(imager::dilate_rect(imager::mirror(blobBoundaries[[1]][[2]],axis="xy"),sx = 3,sy = 3),"xy")
+
+  # combine all of the dilated images together into one image
+  dilatedPx_comb <- dilatedPx + dilatedPx_mirrorx + dilatedPx_mirrory + dilatedPx_mirrorxy
+
+  # we just want a binary labeling
+  dilatedPx_comb[dilatedPx_comb > 0] <- 1
+
+  # the dilated boundaries will have also grown into the blobs, so we take those
+  # pixels out
+  dilatedPx_comb[blobBoundaries[[1]][[2]] > 0] <- 0
+
+  # from: https://stackoverflow.com/questions/34756755/plot-outline-around-raster-cells
+  outline <- dilatedPx_comb %>%
+    as.data.frame() %>%
+    dplyr::filter(value > 0) %>%
+    dplyr::mutate(x = x-1,
+                  y = y-1) %>%
+    raster::rasterFromXYZ() %>%
+    raster::rasterToPolygons(dissolve = TRUE) %>%
+    ggplot2::fortify() %>%
+    #the boundaries around the filtered blobs all share a common value in the
+    #"hole" column of TRUE
+    dplyr::filter(hole) %>%
+    # remove padding used previously
+    dplyr::mutate(lat = lat-5,
+                  long = long-5)
+
+  return(outline)
 
 }
-
-# labelBlobs_skimage <- function(reference,target,filterCutoff = 1){
-#
-#   # pixelwise average and absolute difference between the two scans
-#   refTargAverage <- bind_rows(reference %>%
-#                                 x3pToDF() %>%
-#                                 mutate(value = value),
-#                               target %>%
-#                                 x3pToDF() %>%
-#                                 mutate(value = value)) %>%
-#     group_by(x,y) %>%
-#     summarise(valueDiff = abs(diff(value)),
-#               value = mean(value),
-#               .groups = "drop")
-#
-#   # add to the df created above data on the pixelwise average between ref and
-#   # targ scans. alpha-blend pixels where the pixelwise difference is large.
-#   surfaceMat_df <- refTargAverage %>%
-#     mutate(alpha = ifelse(valueDiff <= filterCutoff,1,0),
-#            x3pName = "Pixelwise Average") %>%
-#     select(-valueDiff) %>%
-#     filter(alpha == 0)
-#
-#   ret <- matrix(0,nrow = nrow(reference$surface.matrix),ncol = ncol(reference$surface.matrix))
-#
-#   for(rowInd in 1:nrow(surfaceMat_df)){
-#     # for some reason the x,y indices here are off by 1 index each from what
-#     # indices are actually filtered in the original image? Not quite sure why
-#     # this is the case.
-#     ret[surfaceMat_df[rowInd,]$y+1,surfaceMat_df[rowInd,]$x+1] <- 1
-#
-#   }
-#
-#   contours <- skimage$measure$find_contours(ret,0,fully_connected="high")
-#
-#   #create a matrix to hold the contours
-#   dat <- matrix(-3L,nrow = nrow(reference$surface.matrix),ncol = ncol(reference$surface.matrix))
-#
-#   polys <- map(contours,
-#                function(cont){
-#
-#                  rows <- as.integer(cont[,1])
-#                  cols <- as.integer(cont[,2])
-#
-#                  ret <- skimage$draw$polygon(rows,cols)
-#
-#                  return(ret)
-#                })
-#
-#
-#
-#   for(polyInd in 1:length(polys)){
-#     dat[matrix(c(polys[[polyInd]][[1]],polys[[polyInd]][[2]]),ncol = 2) + 1L] <- polyInd
-#   }
-#
-#   ret1 <- dat %>%
-#     imager::as.cimg() %>%
-#     as.data.frame() %>%
-#     # cimg labels the x and y image axes incorrectly, so this fixes it
-#     mutate(xnew = y,
-#            ynew = x) %>%
-#     select(-c(x,y)) %>%
-#     rename(x = xnew,y=ynew) %>%
-#     arrange(x,y) %>%
-#     # some edge pixels may not have been flooded with the polygon algorithm
-#     # above, so we need to label the pixels that need to be associated with a
-#     # particular blob with -1
-#     left_join(refTargAverage %>%
-#                 mutate(notFiltered = ifelse(valueDiff <= 1,TRUE,FALSE)) %>%
-#                 mutate(x = x + 1,
-#                        y = y + 1) %>%
-#                 select(x,y,notFiltered),
-#               by = c("x","y")) %>%
-#     mutate(value = ifelse(notFiltered,-1,value)) %>%
-#     select(-notFiltered) %>%
-#     rename(blobNum = value) %>%
-#     mutate(comparisonName = ..4,
-#            cellIndex = ..3)
-#
-#   blobNums <- ret1 %>%
-#     filter(blobNum > 0) %>%
-#     pull(blobNum) %>%
-#     unique()
-#
-#   needABlob <- ret1 %>%
-#     filter(blobNum == -3)
-#
-#   # the pixels labeled -3 are either neighbors of a labeled blob, and
-#   # therefore should be a part of that blob, or should be a blob by
-#   # themselves. it's common for the -3 labeled pixels to be on the edge of the
-#   # image. the following code will progressively fill-in the -3 labeled pixels
-#   # with the neighboring blob label (if there is one) until there are no
-#   # additional labels added (the if statement at the end of the while loop).
-#
-#   if(nrow(needABlob) > 0){
-#
-#     while(any(needABlob$blobNum == -3)){
-#
-#       # make a copy to check at the end of the while loop if anything updated.
-#       ret2 <- ret1
-#
-#       # for each labeled blob, we want to determine if any neighboring pixels
-#       # (within 1 pixel in the x or y direction) has value -1, in which case it
-#       # needs to be included
-#       for(blob in blobNums){
-#
-#         # filters down to the pixels belonging to a particular blob
-#         blobPixels <- ret1 %>%
-#           filter(blobNum == blob) %>%
-#           select(x,y)
-#
-#         # for each pixel in the blob...
-#         for(rowInd in 1:nrow(blobPixels)){
-#
-#           # if that pixel is within the neighborhood of a pixel needing a blob,
-#           # then mark that blob-needing pixel for later flood filling
-#           needABlobNeighbor <- (abs(needABlob$x - blobPixels[rowInd,]$x) <= 1) &
-#             (abs(needABlob$y - blobPixels[rowInd,]$y) <= 1)
-#
-#           if(any(needABlobNeighbor)){
-#
-#             # identify the indices that need updating
-#             rowsToUpdate <- needABlob$x[needABlobNeighbor]
-#             colsToUpdate <- needABlob$y[needABlobNeighbor]
-#
-#             #update the indices directly in ret1
-#             ret1 <- ret1 %>%
-#               mutate(blobNum = ifelse(paste0(x,",",y) %in% paste0(rowsToUpdate,",",colsToUpdate),
-#                                       blob,blobNum))
-#
-#             # remove the newly labeled indices from the needABlob data frame
-#             needABlob <- needABlob %>%
-#               filter(!(paste0(x,",",y) %in% paste0(rowsToUpdate,",",colsToUpdate)))
-#
-#
-#           }
-#
-#         }
-#
-#       }
-#
-#       # the while loop will end on the loop where nothing is updated.
-#       if(all(ret2$blobNum == ret1$blobNum,na.rm = TRUE)){
-#         break
-#       }
-#
-#     }
-#   }
-#
-#   # there are some edge pixels labeled with -3 that are in their own island
-#   # and do not have a neighboring blob. This will create a new blob label for
-#   # those pixels.
-#   ret1 <- ret1 %>%
-#     mutate(blobNum = ifelse(blobNum == -3,max(blobNums) + 1,blobNum))
-#
-#   return(ret1)
-#
-# }
