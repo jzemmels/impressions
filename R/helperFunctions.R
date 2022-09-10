@@ -26,6 +26,54 @@ x3pToDF <- function(x3p,preserveResolution = FALSE){
   return(ret)
 }
 
+
+# helper function for x3pListPlot. Rotates a surface matrix, but doesn't crop
+# back to the original surface matrix's dimensions.
+rotateSurfaceMatrix_noCrop <- function(surfaceMat,
+                                       theta = 0,
+                                       interpolation = 0){
+  surfaceMatFake <- (surfaceMat*10^5) + 1 #scale and shift all non-NA pixels up 1 (meter)
+  # imFakeRotated <- :bilinearInterpolation(imFake,theta)
+  surfaceMatFakeRotated <- surfaceMatFake %>%
+    imager::as.cimg() %>%
+    imager::imrotate(angle = theta,
+                     interpolation = interpolation, #linear interpolation,
+                     boundary = 0) %>% #pad boundary with 0s (dirichlet condition)
+    as.matrix()
+
+  surfaceMatFakeRotated[surfaceMatFakeRotated == 0] <- NA
+  #shift all of the legitimate pixels back down by 1:
+  surfaceMatRotated <- (surfaceMatFakeRotated - 1)/(10^5)
+
+  return(surfaceMatRotated)
+}
+
+# @name linear_to_matrix
+# @param index integer vector of indices, must be between 1 and nrow*ncol
+# @param nrow number of rows, integer value defaults to 7
+# @param ncol  number of columns, integer value, defaults to number of rows
+# @param byrow logical value, is linear index folded into matrix by row (default) or by column (`byrow=FALSE`).
+# @examples
+# index <- sample(nrow*ncol, 10, replace = TRUE)
+# linear_to_matrix(index, nrow=4, ncol = 5, byrow=TRUE)
+#
+# @keywords internal
+# @importFrom rlang .data
+
+linear_to_matrix <- function(index, nrow = 7, ncol = nrow, byrow = TRUE, sep = ", ") {
+  index <- as.integer(index)
+  stopifnot(all(index <= nrow*ncol), all(index > 0))
+
+  if (byrow) { # column is the fast index
+    idx_out_col <- ((index-1) %% ncol) + 1
+    idx_out_row <- ((index-1) %/% ncol) + 1
+  } else { # row is the fast index
+    idx_out_col <- ((index-1) %/% nrow) + 1
+    idx_out_row <- ((index-1) %% nrow) + 1
+  }
+  paste0(idx_out_row, sep, idx_out_col)
+}
+
 targetCellCorners <- function(alignedTargetCell,cellIndex,theta,cmcClassif,target){
 
   targetScanRows <- alignedTargetCell$cmcR.info$regionIndices[c(3)] + alignedTargetCell$cmcR.info$regionRows - 1
@@ -143,53 +191,4 @@ targetCellCorners <- function(alignedTargetCell,cellIndex,theta,cmcClassif,targe
 
   return(ret)
 
-}
-
-# helper function for x3pListPlot. Rotates a surface matrix, but doesn't crop
-# back to the original surface matrix's dimensions.
-rotateSurfaceMatrix_noCrop <- function(surfaceMat,
-                                       theta = 0,
-                                       interpolation = 0){
-  surfaceMatFake <- (surfaceMat*10^5) + 1 #scale and shift all non-NA pixels up 1 (meter)
-  # imFakeRotated <- :bilinearInterpolation(imFake,theta)
-  surfaceMatFakeRotated <- surfaceMatFake %>%
-    imager::as.cimg() %>%
-    imager::imrotate(angle = theta,
-                     interpolation = interpolation, #linear interpolation,
-                     boundary = 0) %>% #pad boundary with 0s (dirichlet condition)
-    as.matrix()
-
-  surfaceMatFakeRotated[surfaceMatFakeRotated == 0] <- NA
-  #shift all of the legitimate pixels back down by 1:
-  surfaceMatRotated <- (surfaceMatFakeRotated - 1)/(10^5)
-
-  return(surfaceMatRotated)
-}
-
-# @name rotateSurfaceMatrix
-#
-# @keywords internal
-# @importFrom rlang .data
-
-utils::globalVariables(".")
-
-rotateSurfaceMatrix <- function(surfaceMat,
-                                theta = 0,
-                                interpolation = 0){
-  surfaceMatFake <- (surfaceMat*10^5) + 1 #scale and shift all non-NA pixels up 1 (meter)
-  # imFakeRotated <- :bilinearInterpolation(imFake,theta)
-  surfaceMatFakeRotated <- surfaceMatFake %>%
-    imager::as.cimg() %>%
-    imager::imrotate(angle = theta,
-                     interpolation = interpolation, #linear interpolation,
-                     cx = floor(nrow(.)/2), #imager treats the rows as the "x" axis of an image
-                     cy = floor(ncol(.)/2),
-                     boundary = 0) %>% #pad boundary with 0s (dirichlet condition)
-    as.matrix()
-
-  surfaceMatFakeRotated[surfaceMatFakeRotated == 0] <- NA
-  #shift all of the legitimate pixels back down by 1:
-  surfaceMatRotated <- (surfaceMatFakeRotated - 1)/(10^5)
-
-  return(surfaceMatRotated)
 }
