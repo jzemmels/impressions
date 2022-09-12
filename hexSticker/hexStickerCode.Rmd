@@ -1,0 +1,28 @@
+---
+title: "R Notebook"
+---
+
+```{r setup}
+library(hexSticker)
+library(tidyverse)
+
+knitr::plot_crop("stickerDraft.png")
+```
+
+```{r}
+img <- imager::load.image("stickerDraft.png")
+
+plt <- img %>%
+  as.data.frame() %>%
+  filter(cc != 4) %>%
+  pivot_wider(id_cols = c(x,y),names_from = cc,values_from = value) %>%
+  mutate(hex = rgb(red = `1`,green = `2`,blue = `3`)) %>%
+  ggplot(aes(x=x,y,y)) +
+  geom_raster(aes(fill = hex)) +
+  coord_fixed(expand = FALSE) +
+  theme_void() +
+  scale_fill_identity() +
+  scale_y_reverse()
+
+hexSticker::sticker(plt,package = "impressions",p_size = 20,s_x = 1,s_y = .8,s_width = 1,s_height = .8,white_around_sticker = FALSE,h_fill = "white",h_color = "#1b3d6e",p_color = "#1b3d6e")
+```
