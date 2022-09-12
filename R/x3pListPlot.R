@@ -1,13 +1,11 @@
 #'Plot a list of x3ps
-#'@name x3pListPlot
+#'@name x3pPlot
 #'
 #'@description Plots the surface matrices in a list of x3p objects. Either
 #'  creates one plot faceted by surface matrix or creates individual plots per
 #'  surface matrix and returns them in a list.
 #'
-#'@param x3pList a list of x3p objects. If the x3p objects are named in the
-#'  list, then these names will be included in the title of their respective
-#'  plot
+#'@param ... one or more x3p objects
 #'@param type dictates whether one plot faceted by surface matrix or a list of
 #'  plots per surface matrix is returned. The faceted plot will have a
 #'  consistent height scale across all surface matrices.
@@ -31,15 +29,21 @@
 #'@importFrom stats setNames median quantile
 #'@importFrom rlang .data
 
-x3pListPlot <- function(x3pList,
+x3pPlot <- function(...,
+                        x3pNames = NULL,
                         type = "faceted",
                         legend.quantiles = c(0,.01,.25,.5,.75,.99,1),
                         height.quantiles = c(0,.01,.025,.1,.25,.5,.75,0.9,.975,.99,1),
                         height.colors = rev(c('#7f3b08','#b35806','#e08214','#fdb863','#fee0b6','#f7f7f7','#d8daeb','#b2abd2','#8073ac','#542788','#2d004b')),
                         na.value = "gray65"){
 
-  if(purrr::is_empty(names(x3pList))){
+  x3pList <- list(...)
+
+  if(is.null(x3pNames)){
     x3pList <- setNames(x3pList,paste0("x3p",1:length(x3pList)))
+  }
+  else{
+    x3pList <- x3pList %>% purrr::set_names(x3pNames)
   }
 
   if(type == "faceted"){

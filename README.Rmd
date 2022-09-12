@@ -1,18 +1,28 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # impressions
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-An R package for diagnosing cartridge case impression comparison
-algorithms.
+An R package for diagnosing cartridge case impression comparison algorithms.
 
 ## Installation
 
-You can install the development version of impressions from
-[GitHub](https://github.com/) with:
+You can install the development version of impressions from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -21,7 +31,7 @@ devtools::install_github("jzemmels/impressions")
 
 ## Example
 
-``` r
+```{r example,warning=FALSE,message=FALSE}
 library(impressions)
 
 library(cmcR)
@@ -31,16 +41,14 @@ data("K013sA1")
 data("K013sA2")
 ```
 
-``` r
+```{r}
 x3pPlot(K013sA1,K013sA2,
         x3pNames = c("Scan A","Scan B"))
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
-
 ### Comparison Plot
 
-``` r
+```{r}
 comparisonData <- cmcR::comparison_allTogether(K013sA1,K013sA2,
                              theta = 3,
                              numCells = c(1,1),
@@ -49,9 +57,9 @@ comparisonData <- cmcR::comparison_allTogether(K013sA1,K013sA2,
                              returnX3Ps = TRUE)
 ```
 
-``` r
+
+```{r,warning=FALSE,message=FALSE}
 x3p_comparisonPlot(x3p1 = comparisonData$cellHeightValues[[1]],
                    x3p2 = comparisonData$alignedTargetCell[[1]])
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />

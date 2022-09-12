@@ -1,0 +1,38 @@
+url: ~
+
+home:
+  title: Diagnose cartridge case comparison algorithms
+
+authors:
+  Joseph Zemmels:
+    href: https://jzemmels.github.io/
+  Heike Hofmann:
+    href: https://github.com/heike
+  Susan VanderPlas:
+    href: https://srvanderplas.netlify.app/
+  CSAFE:
+    href: https://forensicstats.org/
+
+template:
+  bootstrap: 5
+  bslib:
+    primary: "#0054AD"
+    border-radius: 0.5rem
+    btn-border-radius: 0.25rem
+
+reference:
+- title: X3P Operations
+  desc: Transform x3p surface matrix values
+  contents:
+  - x3p_cropWS
+  - x3p_delete
+  - x3p_elemAverage
+  - x3p_filter
+  - x3p_sd
+
+- title: X3P Plots
+  desc: Visualize X3Ps
+  contents:
+  - x3pPlot
+  - x3p_comparisonPlot
+  - cmcPlot
