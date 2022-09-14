@@ -21,7 +21,8 @@ x3p_comparisonPlot <- function(x3p1,
                                              "Element-wise Average",
                                              "x3p1 diff.","x3p2 diff."),
                                type = "faceted",
-                               thresholdMultiplier = 1,
+                               # cutoffThresh = 1,
+                               # thresholdMultiplier = 1,
                                unit = "Norm."){
 
   stopifnot(type %in% c("faceted","list"))
@@ -40,18 +41,21 @@ x3p_comparisonPlot <- function(x3p1,
   # in the foot if I ever try to further develop upon these functions, but oh
   # well.
 
-  cutoffThresh <- thresholdMultiplier*x3p_sd(x3p1,x3p2)
+  cutoffThresh <- x3p_sd(x3p1,x3p2)
 
   x3pAveraged <- x3p_filter(x3p = x3p_elemAverage(x3p1,x3p2),
-                            cond = function(x,thresh) abs(x) < thresh,
+                            cond = function(x,y,thresh) abs(y) <= thresh,
+                            y = c({x3p1$surface.matrix - x3p2$surface.matrix}),
                             thresh = cutoffThresh)
 
   x3p1Differences <- x3p_filter(x3p = x3p1,
-                                cond = function(x,thresh) abs(x) > thresh,
+                                cond = function(x,y,thresh) abs(x - y) > thresh,
+                                y = c(x3p2$surface.matrix),
                                 thresh = cutoffThresh)
 
   x3p2Differences <- x3p_filter(x3p = x3p2,
-                                cond = function(x,thresh) abs(x) > thresh,
+                                cond = function(x,y,thresh) abs(x - y) > thresh,
+                                y = c(x3p1$surface.matrix),
                                 thresh = cutoffThresh)
 
   # to keep a consistent color scheme across all plots, combine the values from
@@ -110,33 +114,31 @@ x3p_comparisonPlot <- function(x3p1,
   ret <- plt$data[[1]] %>%
     dplyr::group_by(PANEL) %>%
     dplyr::group_split() %>%
-    purrr::map2(plotNames,
-                function(dat,title){
+    purrr::map(function(dat){
 
-                  ggplot2::ggplot(data = dat,
-                                  ggplot2::aes(x=x,y=y)) +
-                    ggplot2::geom_raster(ggplot2::aes(fill=fill,alpha=alpha)) +
-                    ggplot2::theme_minimal() +
-                    ggplot2::scale_fill_identity() +
-                    ggplot2::scale_alpha_identity(limits = c(0,1)) +
-                    ggplot2::coord_fixed(expand = FALSE) +
-                    ggplot2::theme_minimal() +
-                    ggplot2::theme(
-                      legend.position = "none",
-                      axis.title.x = ggplot2::element_blank(),
-                      axis.text.x = ggplot2::element_blank(),
-                      axis.ticks.x = ggplot2::element_blank(),
-                      axis.title.y = ggplot2::element_blank(),
-                      axis.text.y = ggplot2::element_blank(),
-                      axis.ticks.y = ggplot2::element_blank(),
-                      panel.grid.major = ggplot2::element_blank(),
-                      panel.grid.minor = ggplot2::element_blank(),
-                      panel.background = ggplot2::element_rect(fill = "gray80"),
-                      plot.title = ggplot2::element_text(size = 7,hjust = .5)
-                    ) +
-                    ggplot2::labs(title = title)
+      ggplot2::ggplot(data = dat,
+                      ggplot2::aes(x=x,y=y)) +
+        ggplot2::geom_raster(ggplot2::aes(fill=fill,alpha=alpha)) +
+        ggplot2::theme_minimal() +
+        ggplot2::scale_fill_identity() +
+        ggplot2::scale_alpha_identity(limits = c(0,1)) +
+        ggplot2::coord_fixed(expand = FALSE) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+          legend.position = "none",
+          axis.title.x = ggplot2::element_blank(),
+          axis.text.x = ggplot2::element_blank(),
+          axis.ticks.x = ggplot2::element_blank(),
+          axis.title.y = ggplot2::element_blank(),
+          axis.text.y = ggplot2::element_blank(),
+          axis.ticks.y = ggplot2::element_blank(),
+          panel.grid.major = ggplot2::element_blank(),
+          panel.grid.minor = ggplot2::element_blank(),
+          panel.background = ggplot2::element_rect(fill = "gray65"),
+          plot.title = ggplot2::element_text(size = 7,hjust = .5)
+        )
 
-                })
+    })
 
   patchComparisonPlts <- c(ret,list(pltLegend))
 
@@ -146,7 +148,7 @@ x3p_comparisonPlot <- function(x3p1,
 
   averageBinarized <- x3pAveraged %>%
     x3pToDF(preserveResolution = FALSE) %>%
-    dplyr::mutate(value = !is.na(value))
+    dplyr::mutate(value = (abs(c({x3p1$surface.matrix - x3p2$surface.matrix})) > cutoffThresh))
 
   outline <- filterBoundaries(averageBinarized)
 
@@ -159,75 +161,65 @@ x3p_comparisonPlot <- function(x3p1,
                      by = c("x","y"))
 
   topLeft <- patchComparisonPlts[[1]] +
-    cowplot::theme_nothing() +
-    # ggplot2::labs(subtitle = "Scan 1") +
+    # cowplot::theme_nothing() +
     ggplot2::annotate(x = ncol(x3p1$surface.matrix)/2,
                       y = nrow(x3p1$surface.matrix)/2,
                       geom = "text",label = plotNames[1]) +
-    ggplot2::theme(plot.margin = ggplot2::margin(0,0,5,0)
-                   # ,plot.subtitle = ggplot2::element_text(hjust = .5,size = 8,vjust = -1)
-    ) +
+    ggplot2::theme(plot.margin = ggplot2::margin(0,0,5,0)) +
     ggplot2::geom_raster(data = combinedValues %>%
                            dplyr::filter(is.na(refValue) & !is.na(targValue)),
-                         fill = "gray40") -
-    ggplot2::geom_raster(fill = "gray80")
+                         fill = "gray40")
+
 
   bottomLeft <-patchComparisonPlts[[2]] +
-    cowplot::theme_nothing() +
-    # ggplot2::labs(subtitle = "Scan 2") +
+    # cowplot::theme_nothing() +
     ggplot2::annotate(x = ncol(x3p1$surface.matrix)/2,
                       y = nrow(x3p1$surface.matrix)/2,
                       geom = "text",label = plotNames[2]) +
-    ggplot2::theme(plot.margin = ggplot2::margin(-20,-100,30,-100)
-                   # ,plot.subtitle = ggplot2::element_text(hjust = .5,vjust = -78,size = 8)
-    ) +
+    ggplot2::theme(plot.margin = ggplot2::margin(-20,-100,30,-100)) +
     ggplot2::geom_raster(data = combinedValues %>%
                            dplyr::filter(!is.na(refValue) & is.na(targValue)),
-                         fill = "gray40") -
-    ggplot2::geom_raster(fill = "gray80")
+                         fill = "gray40")
 
-  middle <- patchComparisonPlts[[3]] +
-    cowplot::theme_nothing() +
-    # ggplot2::labs(subtitle = "Filtered Element-wise Average\nAbs. Differences at Most 1") +
+  middle <- patchComparisonPlts[[3]] -
+    ggplot2::geom_raster(data = averageBinarized %>%
+                           dplyr::filter(!is.na(value)),
+                         aes(x=x,y=y),fill="gray80",
+                         inherit.aes = FALSE) +
     ggplot2::annotate(x = ncol(x3p1$surface.matrix)/2,
                       y = nrow(x3p1$surface.matrix)/2,
                       geom = "text",label = plotNames[3]) +
-    ggplot2::theme(plot.margin = ggplot2::margin(0,25,0,25)
-                   # ,plot.subtitle = ggplot2::element_text(hjust = .5,size = 8,vjust = -5)
-    ) -
-    ggplot2::geom_raster(fill = "gray80") +
+    ggplot2::theme(plot.margin = ggplot2::margin(0,25,0,25)) +
     ggplot2::geom_path(data = outline,  color = "grey40",
                        ggplot2::aes(x=long,y=lat,group=group),
                        colour = "gray40",
                        inherit.aes = FALSE,
                        size = .2)
 
-  topRight <- patchComparisonPlts[[4]] +
-    cowplot::theme_nothing() +
-    # ggplot2::labs(subtitle = "Filtered Scan 1") +
+  topRight <- patchComparisonPlts[[4]] -
+    ggplot2::geom_raster(data = averageBinarized %>%
+                           dplyr::filter(!is.na(value)),
+                         aes(x=x,y=y),fill="gray80",
+                         inherit.aes = FALSE) +
     ggplot2::annotate(x = ncol(x3p1$surface.matrix)/2,
                       y = nrow(x3p1$surface.matrix)/2,
                       geom = "text",label = plotNames[4]) +
-    ggplot2::theme(plot.margin = ggplot2::margin(0,0,5,0)
-                   # ,plot.subtitle = ggplot2::element_text(hjust = .5,size = 8)
-    ) -
-    ggplot2::geom_raster(fill = "gray80") +
+    ggplot2::theme(plot.margin = ggplot2::margin(0,0,5,0))+
     ggplot2::geom_path(data = outline,  color = "grey40",
                        ggplot2::aes(x=long,y=lat,group=group),
                        colour = "gray40",
                        inherit.aes = FALSE,
                        size = .1)
 
-  bottomRight <- patchComparisonPlts[[5]] +
-    cowplot::theme_nothing() +
-    # ggplot2::labs(subtitle = sprintf("Filtered Scan 2")) +
+  bottomRight <- patchComparisonPlts[[5]] -
+    ggplot2::geom_raster(data = averageBinarized %>%
+                           dplyr::filter(!is.na(value)),
+                         aes(x=x,y=y),fill="gray80",
+                         inherit.aes = FALSE) +
     ggplot2::annotate(x = ncol(x3p1$surface.matrix)/2,
                       y = nrow(x3p1$surface.matrix)/2,
                       geom = "text",label = plotNames[5]) +
-    ggplot2::theme(plot.margin = ggplot2::margin(-20,-100,30,-100)
-                   # ,plot.subtitle = ggplot2::element_text(hjust = .5,vjust = -78,size = 8)
-    ) -
-    ggplot2::geom_raster(fill = "gray80") +
+    ggplot2::theme(plot.margin = ggplot2::margin(-20,-100,30,-100))+
     ggplot2::geom_path(data = outline, color = "grey40",
                        ggplot2::aes(x=long,y=lat,group=group),
                        colour = "gray40",
@@ -249,3 +241,5 @@ x3p_comparisonPlot <- function(x3p1,
   }
 
 }
+
+

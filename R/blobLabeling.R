@@ -5,7 +5,7 @@ filterBoundaries <- function(averageBinarized){
 
     averageMat <- averageBinarized %>%
       dplyr::mutate(x = x+1,
-                    y=y+1) %>%
+                    y = y+1) %>%
       as.data.frame() %>%
       dplyr::select(x,y,value) %>%
       imager::as.cimg() %>%
@@ -41,18 +41,18 @@ filterBoundaries <- function(averageBinarized){
   # the mask used to dilate the blobs will grow them towards the bottom-right of
   # the matrix
   dilatedPx <- imager::dilate_rect(boundaryPx,sx = 2,sy = 2)
-  dilatedPx_labels <- imager::dilate_rect(blobBoundaries[[1]][[2]],sx = 2,sy = 2)
+  dilatedPx_labels <- imager::dilate_rect(blobBoundaries[[2]],sx = 2,sy = 2)
 
   # flip the image and re-apply the dilation to grow the borders to the other
   # corners. flip back after dilation
   dilatedPx_mirrorx <- imager::mirror(imager::dilate_rect(imager::mirror(boundaryPx,axis="x"),sx = 2,sy = 2),axis="x")
-  dilatedPx_mirrorx_labels <- imager::mirror(imager::dilate_rect(imager::mirror(blobBoundaries[[1]][[2]],axis="x"),sx = 2,sy = 2),axis="x")
+  dilatedPx_mirrorx_labels <- imager::mirror(imager::dilate_rect(imager::mirror(blobBoundaries[[2]],axis="x"),sx = 2,sy = 2),axis="x")
 
   dilatedPx_mirrory <- imager::mirror(imager::dilate_rect(imager::mirror(boundaryPx,axis="y"),sx = 2,sy = 2),"y")
-  dilatedPx_mirrory_labels <- imager::mirror(imager::dilate_rect(imager::mirror(blobBoundaries[[1]][[2]],axis="y"),sx = 2,sy = 2),"y")
+  dilatedPx_mirrory_labels <- imager::mirror(imager::dilate_rect(imager::mirror(blobBoundaries[[2]],axis="y"),sx = 2,sy = 2),"y")
 
   dilatedPx_mirrorxy <- imager::mirror(imager::dilate_rect(imager::mirror(boundaryPx,axis="xy"),sx = 3,sy = 3),"xy")
-  dilatedPx_mirrorxy_labels <- imager::mirror(imager::dilate_rect(imager::mirror(blobBoundaries[[1]][[2]],axis="xy"),sx = 3,sy = 3),"xy")
+  dilatedPx_mirrorxy_labels <- imager::mirror(imager::dilate_rect(imager::mirror(blobBoundaries[[2]],axis="xy"),sx = 3,sy = 3),"xy")
 
   # combine all of the dilated images together into one image
   dilatedPx_comb <- dilatedPx + dilatedPx_mirrorx + dilatedPx_mirrory + dilatedPx_mirrorxy
@@ -62,7 +62,7 @@ filterBoundaries <- function(averageBinarized){
 
   # the dilated boundaries will have also grown into the blobs, so we take those
   # pixels out
-  dilatedPx_comb[blobBoundaries[[1]][[2]] > 0] <- 0
+  dilatedPx_comb[blobBoundaries[[2]] > 0] <- 0
 
   # from: https://stackoverflow.com/questions/34756755/plot-outline-around-raster-cells
   outline <- dilatedPx_comb %>%
