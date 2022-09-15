@@ -11,19 +11,60 @@
   plot
 }
 
-#' Create plots of filtered element-wise average and differences
+#' Plot filtered element-wise average and differences for two cartridge case
+#' scans
 #' @name x3p_comparisonPlot
+#'
+#' @param x3p1 an x3p object
+#' @param x3p2 another x3p object
+#' @param thresholdMultiplier the default filtering threshold is equal to the
+#'   standard deviation of the joint x3p1 and x3p2 surface matrix values. This
+#'   argument can be used to scale this threshold
+#' @param plotLabels a character vector of five elements that will display as
+#'   labels on each plot
+#' @param labelSize font size for the plot labels
+#' @param label_x horizontal location of the plot labels
+#' @param label_y vertical location of the plot labels
+#' @param type return the five plots in a single, faceted plot or as a list
+#' @param legendLength length of the plot legend. Passed to the barwidth
+#'   argument of the ggplot2::guide_colorbar function
+#' @param legendUnit unit of measurement for the surface values (typically
+#'   either "micron" or "Norm.")
+#' @param legendHoriz horizontal location of the legend. Passed to the
+#'   patchwork::inset_element function
+#' @param legendQuantiles quantile values to be shown as legend labels. Passed
+#'   within the breaks argument of the ggplot2::scale_fill_gradientn function
+#'
+#' @seealso dplyr::guide_colorbar
 #' @importFrom dplyr select
+#'
+#' @examples
+#' data("K013sA1","K013sA2")
+#'
+#' compData <- cmcR::comparison_allTogether(reference = K013sA1,
+#'                                          target = K013sA2,
+#'                                          theta = 3,numCells = c(1,1),
+#'                                          maxMissingProp = .99,
+#'                                          sideLengthMultiplier = 1.1,
+#'                                          returnX3Ps = TRUE)
+#'
+#' x3p_comparisonPlot(x3p1 = compData$cellHeightValues[[1]],x3p2 = compData$alignedTargetCell[[1]])
+#'
 #' @export
 x3p_comparisonPlot <- function(x3p1,
                                x3p2,
-                               plotNames = c("x3p1","x3p2",
+                               thresholdMultiplier = 1,
+                               plotLabels = c("x3p1","x3p2",
                                              "Element-wise Average",
                                              "x3p1 diff.","x3p2 diff."),
+                               labelSize = 4,
+                               label_x = ncol(x3p1$surface.matrix)/2,
+                               label_y = nrow(x3p1$surface.matrix)/2,
                                type = "faceted",
-                               # cutoffThresh = 1,
-                               # thresholdMultiplier = 1,
-                               unit = "Norm."){
+                               legendLength = grid::unit(3,"in"),
+                               legendUnit = "Norm.",
+                               legendHoriz = -1.2,
+                               legendQuantiles = c(0,.01,.25,.5,.75,.99,1)){
 
   stopifnot(type %in% c("faceted","list"))
 
@@ -64,15 +105,15 @@ x3p_comparisonPlot <- function(x3p1,
   x3pCombined <- purrr::map2_dfr(.x = list(x3p1,x3p2,
                                            x3pAveraged,
                                            x3p1Differences,x3p2Differences),
-                                 .y = plotNames,
+                                 .y = plotLabels,
                                  function(x3p,name){
 
                                    x3p %>%
-                                     x3pToDF(preserveResolution = FALSE) %>%
+                                     x3p_to_dataFrame(preserveResolution = FALSE) %>%
                                      dplyr::mutate(x3pName = name,
                                                    alpha = ifelse(!is.na(value),1,0))
                                  })%>%
-    dplyr::mutate(x3pName = factor(x3pName,levels = plotNames))
+    dplyr::mutate(x3pName = factor(x3pName,levels = plotLabels))
 
   x3pPlt <- x3pCombined %>%
     ggplot2::ggplot(ggplot2::aes(x=x,y=y)) +
@@ -80,7 +121,7 @@ x3p_comparisonPlot <- function(x3p1,
     ggplot2::scale_fill_gradientn(colours = c("#2d004b","#542788","#8073ac","#b2abd2","#d8daeb","#f7f7f7","#fee0b6","#fdb863","#e08214","#b35806","#7f3b08"),
                                   values = scales::rescale(quantile(x3pCombined$value,c(0,.01,.025,.1,.25,.5,.75,0.9,.975,.99,1),na.rm = TRUE)),
                                   breaks = function(lims){
-                                    dat <- quantile(x3pCombined$value,c(0,.01,.25,.5,.75,.99,1),na.rm = TRUE)
+                                    dat <- quantile(x3pCombined$value,legendQuantiles,na.rm = TRUE)
 
                                     dat <- dat %>%
                                       setNames(paste0(names(dat),"\n[",round(dat,1),"]"))
@@ -90,8 +131,8 @@ x3p_comparisonPlot <- function(x3p1,
                                   oob = scales::oob_keep,
                                   limits = range(x3pCombined$value),
                                   na.value = "gray65") +
-    ggplot2::labs(fill = paste0("Rel. Height\n[",unit,"]")) +
-    ggplot2::guides(fill = ggplot2::guide_colourbar(barwidth = grid::unit(2,"in"),
+    ggplot2::labs(fill = paste0("Rel. Height\n[",legendUnit,"]")) +
+    ggplot2::guides(fill = ggplot2::guide_colourbar(barwidth = legendLength,
                                                     label.theme = ggplot2::element_text(size = 6),
                                                     title.theme = ggplot2::element_text(size = 8),
                                                     frame.colour = "black",
@@ -147,24 +188,26 @@ x3p_comparisonPlot <- function(x3p1,
   # ret object
 
   averageBinarized <- x3pAveraged %>%
-    x3pToDF(preserveResolution = FALSE) %>%
+    x3p_to_dataFrame(preserveResolution = FALSE) %>%
     dplyr::mutate(value = (abs(c({x3p1$surface.matrix - x3p2$surface.matrix})) > cutoffThresh))
 
   outline <- filterBoundaries(averageBinarized)
 
   combinedValues <-  x3p1 %>%
-    impressions::x3pToDF() %>%
+    impressions::x3p_to_dataFrame() %>%
     dplyr::rename(refValue = value) %>%
     dplyr::left_join(x3p2 %>%
-                       impressions::x3pToDF() %>%
+                       impressions::x3p_to_dataFrame() %>%
                        dplyr::rename(targValue = value),
                      by = c("x","y"))
 
   topLeft <- patchComparisonPlts[[1]] +
     # cowplot::theme_nothing() +
-    ggplot2::annotate(x = ncol(x3p1$surface.matrix)/2,
-                      y = nrow(x3p1$surface.matrix)/2,
-                      geom = "text",label = plotNames[1]) +
+    ggplot2::annotate(x = label_x,
+                      y = label_y,
+                      geom = "text",
+                      size = labelSize,
+                      label = plotLabels[1]) +
     ggplot2::theme(plot.margin = ggplot2::margin(0,0,5,0)) +
     ggplot2::geom_raster(data = combinedValues %>%
                            dplyr::filter(is.na(refValue) & !is.na(targValue)),
@@ -173,9 +216,11 @@ x3p_comparisonPlot <- function(x3p1,
 
   bottomLeft <-patchComparisonPlts[[2]] +
     # cowplot::theme_nothing() +
-    ggplot2::annotate(x = ncol(x3p1$surface.matrix)/2,
-                      y = nrow(x3p1$surface.matrix)/2,
-                      geom = "text",label = plotNames[2]) +
+    ggplot2::annotate(x = label_x,
+                      y = label_y,
+                      geom = "text",
+                      size = labelSize,
+                      label = plotLabels[2]) +
     ggplot2::theme(plot.margin = ggplot2::margin(-20,-100,30,-100)) +
     ggplot2::geom_raster(data = combinedValues %>%
                            dplyr::filter(!is.na(refValue) & is.na(targValue)),
@@ -184,11 +229,13 @@ x3p_comparisonPlot <- function(x3p1,
   middle <- patchComparisonPlts[[3]] -
     ggplot2::geom_raster(data = averageBinarized %>%
                            dplyr::filter(!is.na(value)),
-                         aes(x=x,y=y),fill="gray80",
+                         ggplot2::aes(x=x,y=y),fill="gray80",
                          inherit.aes = FALSE) +
-    ggplot2::annotate(x = ncol(x3p1$surface.matrix)/2,
-                      y = nrow(x3p1$surface.matrix)/2,
-                      geom = "text",label = plotNames[3]) +
+    ggplot2::annotate(x = label_x,
+                      y = label_y,
+                      geom = "text",
+                      size = labelSize,
+                      label = plotLabels[3]) +
     ggplot2::theme(plot.margin = ggplot2::margin(0,25,0,25)) +
     ggplot2::geom_path(data = outline,  color = "grey40",
                        ggplot2::aes(x=long,y=lat,group=group),
@@ -199,11 +246,13 @@ x3p_comparisonPlot <- function(x3p1,
   topRight <- patchComparisonPlts[[4]] -
     ggplot2::geom_raster(data = averageBinarized %>%
                            dplyr::filter(!is.na(value)),
-                         aes(x=x,y=y),fill="gray80",
+                         ggplot2::aes(x=x,y=y),fill="gray80",
                          inherit.aes = FALSE) +
-    ggplot2::annotate(x = ncol(x3p1$surface.matrix)/2,
-                      y = nrow(x3p1$surface.matrix)/2,
-                      geom = "text",label = plotNames[4]) +
+    ggplot2::annotate(x = label_x,
+                      y = label_y,
+                      geom = "text",
+                      size = labelSize,
+                      label = plotLabels[4]) +
     ggplot2::theme(plot.margin = ggplot2::margin(0,0,5,0))+
     ggplot2::geom_path(data = outline,  color = "grey40",
                        ggplot2::aes(x=long,y=lat,group=group),
@@ -214,11 +263,13 @@ x3p_comparisonPlot <- function(x3p1,
   bottomRight <- patchComparisonPlts[[5]] -
     ggplot2::geom_raster(data = averageBinarized %>%
                            dplyr::filter(!is.na(value)),
-                         aes(x=x,y=y),fill="gray80",
+                         ggplot2::aes(x=x,y=y),fill="gray80",
                          inherit.aes = FALSE) +
-    ggplot2::annotate(x = ncol(x3p1$surface.matrix)/2,
-                      y = nrow(x3p1$surface.matrix)/2,
-                      geom = "text",label = plotNames[5]) +
+    ggplot2::annotate(x = label_x,
+                      y = label_y,
+                      geom = "text",
+                      size = labelSize,
+                      label = plotLabels[5]) +
     ggplot2::theme(plot.margin = ggplot2::margin(-20,-100,30,-100))+
     ggplot2::geom_path(data = outline, color = "grey40",
                        ggplot2::aes(x=long,y=lat,group=group),
@@ -231,13 +282,14 @@ x3p_comparisonPlot <- function(x3p1,
     design <- "ACCD\nBCCE"
 
     return(patchwork::wrap_plots(topLeft,bottomLeft,middle,topRight,bottomRight,design = design) +
-             patchwork::inset_element(pltLegend,left = -2.15,bottom = 0,right = -2.15,top = 0,on_top = FALSE,align_to = 'full'))
+             patchwork::inset_element(pltLegend,left = legendHoriz,bottom = 0,right = legendHoriz,top = 0,
+                                      on_top = FALSE,align_to = 'full'))
 
   }
   if(type == "list")
   {
     return(list(topLeft,bottomLeft,middle,topRight,bottomRight,pltLegend) %>%
-             purrr::set_names(c(plotNames,"legend")))
+             purrr::set_names(c(plotLabels,"legend")))
   }
 
 }

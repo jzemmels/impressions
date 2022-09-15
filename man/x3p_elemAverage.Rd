@@ -19,3 +19,11 @@ An x3p object containing the element-wise average between the surface
 Calculates the element-wise average between the surface values
   of two x3ps (of the same dimension)
 }
+\examples{
+data("K013sA1","K013sA2")
+
+ave1 <- x3p_elemAverage(K013sA1,K013sA2)
+
+x3pPlot(K013sA1,K013sA2,ave1)
+
+}

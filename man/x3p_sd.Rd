@@ -19,10 +19,12 @@ Calculates the standard deviation of all surface values of one
   or more x3p objects
 }
 \examples{
+data("K013sA1","K013sA2")
+
 # calculates the sd for a single x3p's surface values
-x3p_sd(x3p)
+x3p_sd(K013sA1)
 
 # calculates the sd for the joint surface values for two x3ps
-x3p_sd(x3p1,x3p2)
+x3p_sd(K013sA1,K013sA2)
 
 }

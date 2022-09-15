@@ -2,17 +2,73 @@
 % Please edit documentation in R/comparisonPlot.R
 \name{x3p_comparisonPlot}
 \alias{x3p_comparisonPlot}
-\title{Create plots of filtered element-wise average and differences}
+\title{Plot filtered element-wise average and differences for two cartridge case
+scans}
 \usage{
 x3p_comparisonPlot(
   x3p1,
   x3p2,
-  plotNames = c("x3p1", "x3p2", "Element-wise Average", "x3p1 diff.", "x3p2 diff."),
-  type = "faceted",
   thresholdMultiplier = 1,
-  unit = "Norm."
+  plotLabels = c("x3p1", "x3p2", "Element-wise Average", "x3p1 diff.", "x3p2 diff."),
+  labelSize = 4,
+  label_x = ncol(x3p1$surface.matrix)/2,
+  label_y = nrow(x3p1$surface.matrix)/2,
+  type = "faceted",
+  legendLength = grid::unit(3, "in"),
+  legendUnit = "Norm.",
+  legendHoriz = -1.2,
+  legendQuantiles = c(0, 0.01, 0.25, 0.5, 0.75, 0.99, 1)
 )
 }
+\arguments{
+\item{x3p1}{an x3p object}
+
+\item{x3p2}{another x3p object}
+
+\item{thresholdMultiplier}{the default filtering threshold is equal to the
+standard deviation of the joint x3p1 and x3p2 surface matrix values. This
+argument can be used to scale this threshold}
+
+\item{plotLabels}{a character vector of five elements that will display as
+labels on each plot}
+
+\item{labelSize}{font size for the plot labels}
+
+\item{label_x}{horizontal location of the plot labels}
+
+\item{label_y}{vertical location of the plot labels}
+
+\item{type}{return the five plots in a single, faceted plot or as a list}
+
+\item{legendLength}{length of the plot legend. Passed to the barwidth
+argument of the ggplot2::guide_colorbar function}
+
+\item{legendUnit}{unit of measurement for the surface values (typically
+either "micron" or "Norm.")}
+
+\item{legendHoriz}{horizontal location of the legend. Passed to the
+patchwork::inset_element function}
+
+\item{legendQuantiles}{quantile values to be shown as legend labels. Passed
+within the breaks argument of the ggplot2::scale_fill_gradientn function}
+}
 \description{
-Create plots of filtered element-wise average and differences
+Plot filtered element-wise average and differences for two cartridge case
+scans
+}
+\examples{
+data("K013sA1","K013sA2")
+
+compData <- cmcR::comparison_allTogether(reference = K013sA1,
+                                         target = K013sA2,
+                                         theta = 3,numCells = c(1,1),
+                                         maxMissingProp = .99,
+                                         sideLengthMultiplier = 1.1,
+                                         returnX3Ps = TRUE)
+
+x3p_comparisonPlot(x3p1 = compData$cellHeightValues[[1]],x3p2 = compData$alignedTargetCell[[1]])
+
+}
+\seealso{
+dplyr::guide_colorbar
 }

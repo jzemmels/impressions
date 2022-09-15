@@ -10,6 +10,13 @@
 #' @return An x3p object containing the element-wise average between the surface
 #'   values of x3p1 and x3p1
 #'
+#' @examples
+#' data("K013sA1","K013sA2")
+#'
+#' ave1 <- x3p_elemAverage(K013sA1,K013sA2)
+#'
+#' x3pPlot(K013sA1,K013sA2,ave1)
+#'
 #' @export
 x3p_elemAverage <- function(x3p1,x3p2){
 
@@ -42,11 +49,13 @@ x3p_elemAverage <- function(x3p1,x3p2){
 #' @return The standard deviation of the input surface matrices
 #'
 #' @examples
+#' data("K013sA1","K013sA2")
+#'
 #' # calculates the sd for a single x3p's surface values
-#' x3p_sd(x3p)
+#' x3p_sd(K013sA1)
 #'
 #' # calculates the sd for the joint surface values for two x3ps
-#' x3p_sd(x3p1,x3p2)
+#' x3p_sd(K013sA1,K013sA2)
 #'
 #' @export
 x3p_sd <- function(...,na.rm = TRUE){
@@ -58,38 +67,45 @@ x3p_sd <- function(...,na.rm = TRUE){
 
 }
 
-#' Filter a surface matrix by an element-wise conditional function
-#' @name x3p_filter
+#'Filter a surface matrix by an element-wise conditional function
+#'@name x3p_filter
 #'
-#' @description Filters the elements of an x3p surface matrix by replacing
-#'   values based on an element-wise conditional (Boolean) function
+#'@description Filters the elements of an x3p surface matrix by replacing values
+#'  based on an element-wise conditional (Boolean) function
 #'
-#' @param x3p an x3p object
-#' @param cond a Boolean function whose first argument is `x`.
-#' @param replacement value to replace each element for which cond returns FALSE
-#' @param ... additional arguments for the cond function
+#'@param x3p an x3p object
+#'@param cond a Boolean function whose first argument is `x`.
+#'@param replacement value to replace each element for which cond returns FALSE
+#'@param ... additional arguments for the cond function
 #'
-#' @note The value returned by the cond function should be the same length as
-#'   the total number of elements in the surface matrix (e.g., use vectorized
-#'   operations)
+#'@note The value returned by the cond function should be the same length as the
+#'  total number of elements in the surface matrix (e.g., use vectorized
+#'  operations)
 #'
-#' @return An x3p object containing a filtered version of the input x3p's
-#'   surface matrix
+#'@return An x3p object containing a filtered version of the input x3p's surface
+#'  matrix
 #'
 #' @examples
+#'data("K013sA1")
 #'
-#' # this will replace values that are larger than one standard deviation of
-#' # the input x3p's surface values with NA:
-#' x3p_filter(x3p,cond = function(x,thresh) x < thresh,thresh = x3p_sd(x3p))
+#' # this will replace values that are larger (in magnitude) than one standard
+#' # deviation of the input x3p's surface values with NA:
+#' filtered1 <- x3p_filter(K013sA1,
+#'                         cond = function(x,thresh) x < thresh,
+#'                         thresh = x3p_sd(K013sA1))
 #'
 #' # this will replace all surface matrix values between -1 and 1 with 0
-#' x3p_filter(x3p,cond = function(x) abs(x) > 1,replacement = 0)
+#' filtered2 <- x3p_filter(K013sA1,cond = function(x) abs(x) > 1,replacement = 0)
 #'
-#' @export
+#' x3pPlot(K013sA1,filtered1,filtered2,
+#'         x3pNames = c("K01sA1","filtered1","filtered2"),
+#'         type = "list")
+#'
+#'@export
 x3p_filter <- function(x3p,cond,replacement = NA,...){
 
   filteredDF <- x3p %>%
-    x3pToDF(preserveResolution = FALSE) %>%
+    x3p_to_dataFrame(preserveResolution = FALSE) %>%
     dplyr::mutate(value = ifelse(do.call(cond,args = alist(x = value,...)),
                                  value,
                                  replacement))

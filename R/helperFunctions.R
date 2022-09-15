@@ -1,9 +1,13 @@
-# Helper functions in this chunk
-
-# this function is mainly intended to transform an x3p object to a data.frame
-# for easy ggplot-ing
-#' @export
-x3pToDF <- function(x3p,preserveResolution = FALSE){
+#' Convert an x3p object to a data frame
+#' @name x3p_to_dataFrame
+#'
+#' @param x3p an x3p object
+#' @param preserveResolution a boolean dictating whether the scan resolution is
+#'   preserved in the returned data frame. If FALSE, then the x,y data frame
+#'   columns will be integer-valued. Otherwise, the difference between
+#'   consecutive x,y values will be equal to the scan resolution.
+#'@export
+x3p_to_dataFrame <- function(x3p,preserveResolution = FALSE){
 
   if(!preserveResolution){
 

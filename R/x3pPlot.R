@@ -6,6 +6,7 @@
 #'  surface matrix and returns them in a list.
 #'
 #'@param ... one or more x3p objects
+#'@param x3pNames character vector containing names of each x3p object
 #'@param type dictates whether one plot faceted by surface matrix or a list of
 #'  plots per surface matrix is returned. The faceted plot will have a
 #'  consistent height scale across all surface matrices.
@@ -17,25 +18,27 @@
 #'  that dictates the height value colorscale
 #'@param na.value color to be used for NA values (passed to
 #'  scale_fill_gradientn)
+#'@param legendLength length of the plot legend. Passed to the barwidth
+#'   argument of the ggplot2::guide_colorbar function
 #'@return A ggplot object or list of ggplot objects showing the surface matrix
 #'  height values.
 #' @examples
-#'data(fadul1.1_processed,fadul1.2_processed)
+#'data("K013sA1","K013sA2")
 #'
-#' x3pListPlot(list("Fadul 1-1" = fadul1.1_processed,
-#'                  "Fadul 1-2" = fadul1.2_processed))
+#' x3pPlot(K013sA1,K013sA2,x3pNames = c("Scan A","Scan B"))
 #'@export
 #'
 #'@importFrom stats setNames median quantile
 #'@importFrom rlang .data
 
 x3pPlot <- function(...,
-                        x3pNames = NULL,
-                        type = "faceted",
-                        legend.quantiles = c(0,.01,.25,.5,.75,.99,1),
-                        height.quantiles = c(0,.01,.025,.1,.25,.5,.75,0.9,.975,.99,1),
-                        height.colors = rev(c('#7f3b08','#b35806','#e08214','#fdb863','#fee0b6','#f7f7f7','#d8daeb','#b2abd2','#8073ac','#542788','#2d004b')),
-                        na.value = "gray65"){
+                    x3pNames = NULL,
+                    type = "faceted",
+                    legend.quantiles = c(0,.01,.25,.5,.75,.99,1),
+                    height.quantiles = c(0,.01,.025,.1,.25,.5,.75,0.9,.975,.99,1),
+                    height.colors = rev(c('#7f3b08','#b35806','#e08214','#fdb863','#fee0b6','#f7f7f7','#d8daeb','#b2abd2','#8073ac','#542788','#2d004b')),
+                    na.value = "gray65",
+                    legendLength = grid::unit(3,"in")){
 
   x3pList <- list(...)
 
@@ -98,7 +101,7 @@ x3pPlot <- function(...,
         panel.grid.major = ggplot2::element_blank(),
         panel.grid.minor = ggplot2::element_blank(),
         panel.background = ggplot2::element_blank()) +
-      ggplot2::guides(fill = ggplot2::guide_colourbar(barheight = grid::unit(2.5,"in"),
+      ggplot2::guides(fill = ggplot2::guide_colourbar(barheight = legendLength,
                                                       label.theme = ggplot2::element_text(size = 8),
                                                       title.theme = ggplot2::element_text(size = 10),
                                                       frame.colour = "black",
@@ -133,7 +136,7 @@ x3pPlot <- function(...,
                             ggplot2::ggplot(ggplot2::aes(x = .data$x,y = .data$y)) +
                             ggplot2::geom_raster(ggplot2::aes(fill = .data$value))  +
                             ggplot2::scale_fill_gradientn(colours = height.colors,
-                                                          values = scales::rescale(quantile(surfaceMat_df$value,c(0,.01,.025,.1,.25,.5,.75,0.9,.975,.99,1),na.rm = TRUE)),
+                                                          values = scales::rescale(quantile(surfaceMat_df$value,height.quantiles,na.rm = TRUE)),
                                                           breaks = function(lims){
                                                             dat <- quantile(surfaceMat_df$value,legend.quantiles,na.rm = TRUE)
 
@@ -157,7 +160,7 @@ x3pPlot <- function(...,
                               panel.background = ggplot2::element_blank(),
                               plot.title = ggplot2::element_text(hjust = .5,
                                                                  size = 11)) +
-                            ggplot2::guides(fill = ggplot2::guide_colourbar(barheight = grid::unit(3,"in"),
+                            ggplot2::guides(fill = ggplot2::guide_colourbar(barheight = legendLength,
                                                                             label.theme = ggplot2::element_text(size = 8),
                                                                             title.theme = ggplot2::element_text(size = 10),
                                                                             frame.colour = "black",

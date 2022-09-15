@@ -16,25 +16,32 @@ x3p_filter(x3p, cond, replacement = NA, ...)
 \item{...}{additional arguments for the cond function}
 }
 \value{
-An x3p object containing a filtered version of the input x3p's
-  surface matrix
+An x3p object containing a filtered version of the input x3p's surface
+ matrix
 }
 \description{
-Filters the elements of an x3p surface matrix by replacing
-  values based on an element-wise conditional (Boolean) function
+Filters the elements of an x3p surface matrix by replacing values
+ based on an element-wise conditional (Boolean) function
 }
 \note{
-The value returned by the cond function should be the same length as
-  the total number of elements in the surface matrix (e.g., use vectorized
-  operations)
+The value returned by the cond function should be the same length as the
+ total number of elements in the surface matrix (e.g., use vectorized
+ operations)
 }
 \examples{
+data("K013sA1")
 
-# this will replace values that are larger than one standard deviation of
-# the input x3p's surface values with NA:
-x3p_filter(x3p,cond = function(x,thresh) x < thresh,thresh = x3p_sd(x3p))
+# this will replace values that are larger (in magnitude) than one standard
+# deviation of the input x3p's surface values with NA:
+filtered1 <- x3p_filter(K013sA1,
+                        cond = function(x,thresh) x < thresh,
+                        thresh = x3p_sd(K013sA1))
 
 # this will replace all surface matrix values between -1 and 1 with 0
-x3p_filter(x3p,cond = function(x) abs(x) > 1,replacement = 0)
+filtered2 <- x3p_filter(K013sA1,cond = function(x) abs(x) > 1,replacement = 0)
+
+x3pPlot(K013sA1,filtered1,filtered2,
+        x3pNames = c("K01sA1","filtered1","filtered2"),
+        type = "list")
 
 }

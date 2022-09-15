@@ -35,4 +35,4 @@ reference:
   contents:
   - x3pPlot
   - x3p_comparisonPlot
-  - cmcPlot
+  - x3p_to_dataFrame
