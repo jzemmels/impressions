@@ -25,7 +25,6 @@ reference:
   desc: Transform x3p surface matrix values
   contents:
   - x3p_cropWS
-  - x3p_delete
   - x3p_elemAverage
   - x3p_filter
   - x3p_sd

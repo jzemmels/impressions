@@ -1,23 +1,69 @@
-#' Calculate the element-wise average between two x3ps
-#' @name x3p_elemAverage
+#'Transform x3p surface matrix values
 #'
-#' @description Calculates the element-wise average between the surface values
-#'   of two x3ps (of the same dimension)
+#'Transform the values of a x3p surface matrix
 #'
-#' @param x3p1 an x3p object
-#' @param x3p2 another x3p object
+#'@param ... one or more x3p objects
+#'@param x3p an x3p object
+#'@param x3p1 an x3p object
+#'@param x3p2 another x3p object
+#'@param cond a Boolean function whose first argument is `x`.
+#'@param replacement value to replace each element for which cond returns FALSE
+#'@param na.rm logical. Should missing values be removed?
+#'@param croppingThresh minimum number of non-NA pixels that need to be in a
+#'  row/column for it to not be cropped out of the surface matrix
+#'@param mask_vals a hexidecimal color value that corresponds to indices in a
+#'  mask whose indices are to be replaced in the associated surface matrix
+#'@param preserveResolution a Boolean dictating whether the scan resolution is
+#'  preserved in the returned data frame. If FALSE, then the x,y data frame
+#'  columns will be integer-valued. Otherwise, the difference between
+#'  consecutive x,y values will be equal to the scan resolution.
 #'
-#' @return An x3p object containing the element-wise average between the surface
-#'   values of x3p1 and x3p1
+#'@description
+#'`x3p_elemAverage()` calculate the element-wise average between two surface
+#'matrices (of the same dimensions)
+#'
+#'`x3p_sd()` Calculate the standard deviation of x3p surface values
+#'
+#'`x3p_filter()` replace values of a surface matrix based on an element-wise
+#'conditional function
+#'
+#'`x3p_cropWS()` Crop rows/columns of missing values around an x3p
+#'
+#'`x3p_to_dataFrame()` Convert an x3p object to a data frame
 #'
 #' @examples
 #' data("K013sA1","K013sA2")
 #'
-#' ave1 <- x3p_elemAverage(K013sA1,K013sA2)
+#' # calculates the sd for a single x3p's surface values
+#' x3p_sd(K013sA1)
 #'
-#' x3pPlot(K013sA1,K013sA2,ave1)
+#' # calculates the sd for the joint surface values for two x3ps
+#' x3p_sd(K013sA1,K013sA2)
 #'
-#' @export
+#' # calculate optimal alignment between the two x3ps
+#' K013sA2_aligned <- cmcR::comparison_allTogether(K013sA1,K013sA2,theta = -3,
+#'                                                 returnX3Ps = TRUE,numCells = c(1,1),
+#'                                                 maxMissingProp = .99)$alignedTargetCell[[1]]
+#'
+#' averaged <- x3p_elemAverage(K013sA1,K013sA2_aligned)
+#'
+#' # this will replace values that are larger (in magnitude) than one standard
+#' # deviation of the input x3p's surface values with NA:
+#' filtered1 <- x3p_filter(K013sA1,
+#'                         cond = function(x,thresh) x < thresh,
+#'                         thresh = x3p_sd(K013sA1))
+#'
+#' # this will replace all surface matrix values between -1 and 1 with 0
+#' filtered2 <- x3p_filter(K013sA1,cond = function(x) abs(x) > 1,replacement = 0)
+#'
+#' # exaggerated cropping for the sake of an example
+#' cropped <- x3p_cropWS(K013sA1,croppingThresh = 100)
+#'
+#' x3pPlot(K013sA1,K013sA2_aligned,averaged,filtered1,filtered2,cropped,
+#'         x3pNames = c("K01sA1","K013sA2 Aligned","Averaged","Filtered1","Filtered2","Cropped"))
+#'
+#'@rdname x3pOperations
+#'@export
 x3p_elemAverage <- function(x3p1,x3p2){
 
   stopifnot(all(dim(x3p1$surface.matrix) == dim(x3p2$surface.matrix)))
@@ -37,26 +83,7 @@ x3p_elemAverage <- function(x3p1,x3p2){
 
 }
 
-#' Calculate the standard deviation of x3p surface values
-#' @name x3p_sd
-#'
-#' @description Calculates the standard deviation of all surface values of one
-#'   or more x3p objects
-#'
-#' @param ... one or more x3p objects
-#' @param na.rm logical. Should missing values be removed?
-#'
-#' @return The standard deviation of the input surface matrices
-#'
-#' @examples
-#' data("K013sA1","K013sA2")
-#'
-#' # calculates the sd for a single x3p's surface values
-#' x3p_sd(K013sA1)
-#'
-#' # calculates the sd for the joint surface values for two x3ps
-#' x3p_sd(K013sA1,K013sA2)
-#'
+#' @rdname x3pOperations
 #' @export
 x3p_sd <- function(...,na.rm = TRUE){
 
@@ -67,40 +94,7 @@ x3p_sd <- function(...,na.rm = TRUE){
 
 }
 
-#'Filter a surface matrix by an element-wise conditional function
-#'@name x3p_filter
-#'
-#'@description Filters the elements of an x3p surface matrix by replacing values
-#'  based on an element-wise conditional (Boolean) function
-#'
-#'@param x3p an x3p object
-#'@param cond a Boolean function whose first argument is `x`.
-#'@param replacement value to replace each element for which cond returns FALSE
-#'@param ... additional arguments for the cond function
-#'
-#'@note The value returned by the cond function should be the same length as the
-#'  total number of elements in the surface matrix (e.g., use vectorized
-#'  operations)
-#'
-#'@return An x3p object containing a filtered version of the input x3p's surface
-#'  matrix
-#'
-#' @examples
-#'data("K013sA1")
-#'
-#' # this will replace values that are larger (in magnitude) than one standard
-#' # deviation of the input x3p's surface values with NA:
-#' filtered1 <- x3p_filter(K013sA1,
-#'                         cond = function(x,thresh) x < thresh,
-#'                         thresh = x3p_sd(K013sA1))
-#'
-#' # this will replace all surface matrix values between -1 and 1 with 0
-#' filtered2 <- x3p_filter(K013sA1,cond = function(x) abs(x) > 1,replacement = 0)
-#'
-#' x3pPlot(K013sA1,filtered1,filtered2,
-#'         x3pNames = c("K01sA1","filtered1","filtered2"),
-#'         type = "list")
-#'
+#'@rdname x3pOperations
 #'@export
 x3p_filter <- function(x3p,cond,replacement = NA,...){
 
@@ -115,39 +109,13 @@ x3p_filter <- function(x3p,cond,replacement = NA,...){
                                ncol = ncol(x3p$surface.matrix))
 
   return(x3p)
-  # %>%
-  #   x3ptools::df_to_x3p() %>%
-  #   x3ptools::x3p_flip_y() %>%
-  #   x3ptools::x3p_rotate(angle = 270)
 
 }
 
-#' Crop rows/columns of missing values around an x3p
-#'
-#' @name x3p_cropWS
-#'
-#' @param x3p an x3p object containing a surface matrix
-#' @param croppingThresh minimum number of non-NA pixels that need to be in a
-#'   row/column for it to not be cropped out of the surface matrix
-#' @param crop
-#'
-#' @return a surface matrix with outer rows/columns removed depending on
-#'   croppingThresh
-#'
-#' @examples
-#' data("K013sA1")
-#'
-#' x3pCropped <- x3p_cropWS(K013sA1,croppingThresh = 5)
-#'
-#'x3pPlot(K013sA1,x3pCropped)
-#'
-#' @export
-
+#'@rdname x3pOperations
+#'@export
 x3p_cropWS <- function (x3p,
-                        croppingThresh = 1,
-                        # croppingProp = 0.5,
-                        # robust = FALSE,
-                        ...){
+                        croppingThresh = 1){
 
   surfaceMat <- x3p$surface.matrix
 
@@ -180,25 +148,27 @@ x3p_cropWS <- function (x3p,
   return(x3p)
 }
 
-#' Replace elements of a surface matrix based on a mask
-#'
-#' @name x3p_delete
-#'
-#' @param x3p an x3p object
-#' @param mask_vals a hexidecimal color value that corresponds to indices in a
-#'   mask whose indices are to be replaced in the associated surface
-#'   matrix
-#' @param replacement value used replace indices in the surface matrix
-#'
-#' @export
+#'@rdname x3pOperations
+#'@export
+x3p_to_dataFrame <- function(x3p,preserveResolution = FALSE){
 
-x3p_delete <- function(x3p, mask_vals, replacement = NA) {
+  if(!preserveResolution){
 
-  idx <- which(t(as.matrix(x3p$mask)) %in% mask_vals)
-  x3p$surface.matrix[idx] <- replacement
-  x3p$mask <- NULL
+    x3p$header.info$incrementX <- 1
+    x3p$header.info$incrementY <- 1
 
-  x3p <- x3p_cropWS(x3p)
+  }
 
-  return(x3p)
+  ret <- x3p %>%
+    x3ptools::x3p_to_df() %>%
+    #perform some transformations on the x,y values so that the plot is
+    #representative of the actual surface matrix (i.e., element [1,1] of the
+    #surface matrix is in the top-left corner)
+    dplyr::mutate(xnew = max(y) - y,
+                  ynew = max(x) - x) %>%
+    dplyr::select(-c(x,y)) %>%
+    dplyr::rename(x=xnew,
+                  y=ynew)
+
+  return(ret)
 }

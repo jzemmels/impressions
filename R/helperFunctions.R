@@ -1,36 +1,3 @@
-#' Convert an x3p object to a data frame
-#' @name x3p_to_dataFrame
-#'
-#' @param x3p an x3p object
-#' @param preserveResolution a boolean dictating whether the scan resolution is
-#'   preserved in the returned data frame. If FALSE, then the x,y data frame
-#'   columns will be integer-valued. Otherwise, the difference between
-#'   consecutive x,y values will be equal to the scan resolution.
-#'@export
-x3p_to_dataFrame <- function(x3p,preserveResolution = FALSE){
-
-  if(!preserveResolution){
-
-    x3p$header.info$incrementX <- 1
-    x3p$header.info$incrementY <- 1
-
-  }
-
-  ret <- x3p %>%
-    x3ptools::x3p_to_df() %>%
-    #perform some transformations on the x,y values so that the plot is
-    #representative of the actual surface matrix (i.e., element [1,1] of the
-    #surface matrix is in the top-left corner)
-    dplyr::mutate(xnew = max(y) - y,
-                  ynew = max(x) - x) %>%
-    dplyr::select(-c(x,y)) %>%
-    dplyr::rename(x=xnew,
-                  y=ynew)
-
-  return(ret)
-}
-
-
 # helper function for x3pListPlot. Rotates a surface matrix, but doesn't crop
 # back to the original surface matrix's dimensions.
 rotateSurfaceMatrix_noCrop <- function(surfaceMat,
