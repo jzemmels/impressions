@@ -16,36 +16,6 @@
     <loc>/LICENSE.html</loc>
   </url>
   <url>
-    <loc>/reference/comparison_cellBased.html</loc>
-  </url>
-  <url>
-    <loc>/reference/comparison_fullScan.html</loc>
-  </url>
-  <url>
-    <loc>/reference/densityBasedClusters.html</loc>
-  </url>
-  <url>
-    <loc>/reference/estimatedRotation.html</loc>
-  </url>
-  <url>
-    <loc>/reference/feature_densityBasedAll.html</loc>
-  </url>
-  <url>
-    <loc>/reference/feature_densityBasedClusterSize.html</loc>
-  </url>
-  <url>
-    <loc>/reference/feature_densityBasedThetaDiff.html</loc>
-  </url>
-  <url>
-    <loc>/reference/feature_densityBasedTranslationDiff.html</loc>
-  </url>
-  <url>
-    <loc>/reference/feature_registration_all.html</loc>
-  </url>
-  <url>
-    <loc>/reference/feature_registration_summary.html</loc>
-  </url>
-  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>

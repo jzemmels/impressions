@@ -29,10 +29,10 @@ reference:
   - x3p_elemAverage
   - x3p_filter
   - x3p_sd
+  - x3p_to_dataFrame
 
 - title: X3P Plots
   desc: Visualize X3Ps
   contents:
   - x3pPlot
   - x3p_comparisonPlot
-  - x3p_to_dataFrame
