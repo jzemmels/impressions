@@ -124,7 +124,7 @@ x3p_filter <- function(x3p,cond,replacement = NA,...){
 
 #' Crop rows/columns of missing values around an x3p
 #'
-#' @name preProcess_cropWS
+#' @name x3p_cropWS
 #'
 #' @param x3p an x3p object containing a surface matrix
 #' @param croppingThresh minimum number of non-NA pixels that need to be in a
@@ -135,15 +135,11 @@ x3p_filter <- function(x3p,cond,replacement = NA,...){
 #'   croppingThresh
 #'
 #' @examples
-#' \dontrun{
-#' raw_x3p <- x3ptools::read_x3p("path/to/file.x3p") %>%
-#'   x3ptools::sample_x3p(m = 2)
+#' data("K013sA1")
 #'
-#' raw_x3p$surface.matrix <- raw_x3p$surface.matrix %>%
-#'   cmcR::preProcess_ransacLevel() %>%
-#'   cmcR::preProcess_levelBF() %>%
-#'   cmcR::preProcess_cropWS(croppingThresh = 2)
-#' }
+#' x3pCropped <- x3p_cropWS(K013sA1,croppingThresh = 5)
+#'
+#'x3pPlot(K013sA1,x3pCropped)
 #'
 #' @export
 
