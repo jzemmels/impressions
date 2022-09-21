@@ -40,14 +40,8 @@ row/column for it to not be cropped out of the surface matrix}
 preserved in the returned data frame. If FALSE, then the x,y data frame
 columns will be integer-valued. Otherwise, the difference between
 consecutive x,y values will be equal to the scan resolution.}
-
-\item{mask_vals}{a hexidecimal color value that corresponds to indices in a
-mask whose indices are to be replaced in the associated surface matrix}
 }
 \description{
-Transform the values of a x3p surface matrix
-}
-\details{
 `x3p_elemAverage()` calculate the element-wise average between two surface
 matrices (of the same dimensions)
 
@@ -59,6 +53,9 @@ conditional function
 `x3p_cropWS()` Crop rows/columns of missing values around an x3p
 
 `x3p_to_dataFrame()` Convert an x3p object to a data frame
+}
+\details{
+Transform the values of a x3p surface matrix
 }
 \examples{
 data("K013sA1","K013sA2")

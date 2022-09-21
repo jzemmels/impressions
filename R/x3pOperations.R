@@ -11,8 +11,6 @@
 #'@param na.rm logical. Should missing values be removed?
 #'@param croppingThresh minimum number of non-NA pixels that need to be in a
 #'  row/column for it to not be cropped out of the surface matrix
-#'@param mask_vals a hexidecimal color value that corresponds to indices in a
-#'  mask whose indices are to be replaced in the associated surface matrix
 #'@param preserveResolution a Boolean dictating whether the scan resolution is
 #'  preserved in the returned data frame. If FALSE, then the x,y data frame
 #'  columns will be integer-valued. Otherwise, the difference between
