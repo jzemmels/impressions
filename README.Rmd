@@ -29,17 +29,27 @@ You can install the development version of impressions from [GitHub](https://git
 devtools::install_github("jzemmels/impressions")
 ```
 
-## Example
+## Visual Diagnostics
 
-```{r example,warning=FALSE,message=FALSE}
+As an example, consider two cartridge cases fired from the same Ruger SR9 semiautomatic 9-mm handgun.
+Learn more about the collection of these cartridge cases [here](https://www.ojp.gov/pdffiles1/nij/249874.pdf).
+The cartridge cases are uniquely identified as "K013sA1" and "K013sA2."
+We assume that the markings on these cartridge cases left by the handgun during the firing process are similar.
+
+```{r setup,warning=FALSE,message=FALSE}
 library(impressions)
 
 library(cmcR)
 library(tidyverse)
 
-data("K013sA1")
-data("K013sA2")
+data("K013sA1","K013sA2")
 ```
+
+Below is a visual of the two cartridge case scans.
+Note that these scans have already undergone some preprocessing to emphasize the breech face impression markings.
+The similarity between these cartridge cases is not immediately apparent.
+The color scheme of these plots is chosen to highlight extreme values (far from the median value) in the scan, meaning small, local similarities are not highlighted.
+We can use visual diagnostics available in the `impressions` package to understand the similarity between these scans.
 
 ```{r}
 x3pPlot(K013sA1,K013sA2,
@@ -47,6 +57,11 @@ x3pPlot(K013sA1,K013sA2,
 ```
 
 ### Comparison Plot
+
+The comparison plot is a powerful tool to separate two cartridge case scans into "similar" and "different" regions.
+First, we attempt to align these two scans by rotating and translating K013sA2 to match K013sA1.
+We use the `cmcR::comparison_allTogether()` function to estimate this alignment. 
+For the sake of this example, we'll consider K013sA2 rotated by 3 degrees and translated to maximize the cross-correlation function with K013sA1.
 
 ```{r}
 comparisonData <- cmcR::comparison_allTogether(K013sA1,K013sA2,
@@ -57,6 +72,7 @@ comparisonData <- cmcR::comparison_allTogether(K013sA1,K013sA2,
                                                returnX3Ps = TRUE)
 ```
 
+The resulting `comparisonData` data frame contains a transformed version of scan K013sA2 after rotating/translating to align with K013sA1. We'll pass this transformed scan to the `x3p2` argument.
 
 ```{r,warning=FALSE,message=FALSE}
 x3p_comparisonPlot(x3p1 = comparisonData$cellHeightValues[[1]],

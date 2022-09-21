@@ -76,16 +76,29 @@ algorithms.</p>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"jzemmels/impressions"</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+<h2 id="visual-diagnostics">Visual Diagnostics<a class="anchor" aria-label="anchor" href="#visual-diagnostics"></a>
 </h2>
+<p>As an example, consider two cartridge cases fired from the same Ruger
+SR9 semiautomatic 9-mm handgun. Learn more about the collection of these
+cartridge cases <a href="https://www.ojp.gov/pdffiles1/nij/249874.pdf" class="external-link">here</a>. The
+cartridge cases are uniquely identified as “K013sA1” and “K013sA2.” We
+assume that the markings on these cartridge cases left by the handgun
+during the firing process are similar.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">impressions</span><span class="op">)</span>
 
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">cmcR</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"K013sA1"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"K013sA2"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"K013sA1"</span>,<span class="st">"K013sA2"</span><span class="op">)</span></code></pre></div>
+<p>Below is a visual of the two cartridge case scans. Note that these
+scans have already undergone some preprocessing to emphasize the breech
+face impression markings. The similarity between these cartridge cases
+is not immediately apparent. The color scheme of these plots is chosen
+to highlight extreme values (far from the median value) in the scan,
+meaning small, local similarities are not highlighted. We can use visual
+diagnostics available in the <code>impressions</code> package to
+understand the similarity between these scans.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/x3pPlot.html">x3pPlot</a></span><span class="op">(</span><span class="va">K013sA1</span>,<span class="va">K013sA2</span>,
         x3pNames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Scan A"</span>,<span class="st">"Scan B"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -93,6 +106,13 @@ algorithms.</p>
 <div class="section level3">
 <h3 id="comparison-plot">Comparison Plot<a class="anchor" aria-label="anchor" href="#comparison-plot"></a>
 </h3>
+<p>The comparison plot is a powerful tool to separate two cartridge case
+scans into “similar” and “different” regions. First, we attempt to align
+these two scans by rotating and translating K013sA2 to match K013sA1. We
+use the <code><a href="https://rdrr.io/pkg/cmcR/man/comparison_allTogether.html" class="external-link">cmcR::comparison_allTogether()</a></code> function to estimate
+this alignment. For the sake of this example, we’ll consider K013sA2
+rotated by 3 degrees and translated to maximize the cross-correlation
+function with K013sA1.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">comparisonData</span> <span class="op">&lt;-</span> <span class="fu">cmcR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/cmcR/man/comparison_allTogether.html" class="external-link">comparison_allTogether</a></span><span class="op">(</span><span class="va">K013sA1</span>,<span class="va">K013sA2</span>,
                                                theta <span class="op">=</span> <span class="fl">3</span>,
@@ -100,6 +120,10 @@ algorithms.</p>
                                                maxMissingProp <span class="op">=</span> <span class="fl">.99</span>,
                                                sideLengthMultiplier <span class="op">=</span> <span class="fl">1.1</span>,
                                                returnX3Ps <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p>The resulting <code>comparisonData</code> data frame contains a
+transformed version of scan K013sA2 after rotating/translating to align
+with K013sA1. We’ll pass this transformed scan to the <code>x3p2</code>
+argument.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/x3p_comparisonPlot.html">x3p_comparisonPlot</a></span><span class="op">(</span>x3p1 <span class="op">=</span> <span class="va">comparisonData</span><span class="op">$</span><span class="va">cellHeightValues</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,
                    x3p2 <span class="op">=</span> <span class="va">comparisonData</span><span class="op">$</span><span class="va">alignedTargetCell</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,
