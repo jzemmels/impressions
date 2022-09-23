@@ -82,7 +82,7 @@ x3p_comparisonPlot <- function(x3p1,
   # in the foot if I ever try to further develop upon these functions, but oh
   # well.
 
-  cutoffThresh <- x3p_sd(x3p1,x3p2)
+  cutoffThresh <- x3p_sd(x3p1,x3p2)*thresholdMultiplier
 
   x3pAveraged <- x3p_filter(x3p = x3p_elemAverage(x3p1,x3p2),
                             cond = function(x,y,thresh) abs(y) <= thresh,
