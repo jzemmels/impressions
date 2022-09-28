@@ -6,6 +6,7 @@
 \alias{x3p_filter}
 \alias{x3p_cropWS}
 \alias{x3p_to_dataFrame}
+\alias{x3p_delete}
 \title{Transform x3p surface matrix values}
 \usage{
 x3p_elemAverage(x3p1, x3p2)
@@ -17,6 +18,8 @@ x3p_filter(x3p, cond, replacement = NA, ...)
 x3p_cropWS(x3p, croppingThresh = 1)
 
 x3p_to_dataFrame(x3p, preserveResolution = FALSE)
+
+x3p_delete(x3p, mask_vals)
 }
 \arguments{
 \item{x3p1}{an x3p object}
@@ -40,19 +43,25 @@ row/column for it to not be cropped out of the surface matrix}
 preserved in the returned data frame. If FALSE, then the x,y data frame
 columns will be integer-valued. Otherwise, the difference between
 consecutive x,y values will be equal to the scan resolution.}
+
+\item{mask_vals}{a hexidecimal color value that corresponds to indices in a
+mask whose indices are to be replaced in the associated surface}
 }
 \description{
-`x3p_elemAverage()` calculate the element-wise average between two surface
-matrices (of the same dimensions)
+x3p_elemAverage() calculate the element-wise average between
+two surface matrices (of the same dimensions)
 
-`x3p_sd()` Calculate the standard deviation of x3p surface values
+x3p_sd() Calculate the standard deviation of x3p surface values
 
-`x3p_filter()` replace values of a surface matrix based on an element-wise
+x3p_filter() replace values of a surface matrix based on an element-wise
 conditional function
 
-`x3p_cropWS()` Crop rows/columns of missing values around an x3p
+x3p_cropWS() Crop rows/columns of missing values around an x3p
 
-`x3p_to_dataFrame()` Convert an x3p object to a data frame
+x3p_to_dataFrame() Convert an x3p object to a data frame
+
+x3p_delete() replace values in a surface matrix with NA depending on an
+associated mask.
 }
 \details{
 Transform the values of a x3p surface matrix

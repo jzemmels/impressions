@@ -15,19 +15,25 @@
 #'  preserved in the returned data frame. If FALSE, then the x,y data frame
 #'  columns will be integer-valued. Otherwise, the difference between
 #'  consecutive x,y values will be equal to the scan resolution.
+#'@param mask_vals a hexidecimal color value that corresponds to indices in a
+#'  mask whose indices are to be replaced in the associated surface
 #'
 #'@description
-#'`x3p_elemAverage()` calculate the element-wise average between two surface
-#'matrices (of the same dimensions)
 #'
-#'`x3p_sd()` Calculate the standard deviation of x3p surface values
+#'x3p_elemAverage() calculate the element-wise average between
+#'two surface matrices (of the same dimensions)
 #'
-#'`x3p_filter()` replace values of a surface matrix based on an element-wise
+#'x3p_sd() Calculate the standard deviation of x3p surface values
+#'
+#'x3p_filter() replace values of a surface matrix based on an element-wise
 #'conditional function
 #'
-#'`x3p_cropWS()` Crop rows/columns of missing values around an x3p
+#'x3p_cropWS() Crop rows/columns of missing values around an x3p
 #'
-#'`x3p_to_dataFrame()` Convert an x3p object to a data frame
+#'x3p_to_dataFrame() Convert an x3p object to a data frame
+#'
+#'x3p_delete() replace values in a surface matrix with NA depending on an
+#'associated mask.
 #'
 #' @examples
 #' data("K013sA1","K013sA2")
@@ -169,4 +175,17 @@ x3p_to_dataFrame <- function(x3p,preserveResolution = FALSE){
                   y=ynew)
 
   return(ret)
+}
+
+#'@rdname x3pOperations
+#'@export
+x3p_delete <- function(x3p, mask_vals) {
+
+  idx <- which(t(as.matrix(x3p$mask)) %in% mask_vals)
+  x3p$surface.matrix[idx] <- NA
+  x3p$mask <- NULL
+
+  x3p <- x3p_cropWS(x3p)
+
+  return(x3p)
 }
