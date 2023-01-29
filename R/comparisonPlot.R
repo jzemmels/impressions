@@ -203,28 +203,28 @@ x3p_comparisonPlot <- function(x3p1,
 
   topLeft <- patchComparisonPlts[[1]] +
     # cowplot::theme_nothing() +
+    ggplot2::theme(plot.margin = ggplot2::margin(0,0,5,0)) +
+    ggplot2::geom_raster(data = combinedValues %>%
+                           dplyr::filter(is.na(refValue) & !is.na(targValue)),
+                         fill = "gray40") +
     ggplot2::annotate(x = label_x,
                       y = label_y,
                       geom = "text",
                       size = labelSize,
-                      label = plotLabels[1]) +
-    ggplot2::theme(plot.margin = ggplot2::margin(0,0,5,0)) +
-    ggplot2::geom_raster(data = combinedValues %>%
-                           dplyr::filter(is.na(refValue) & !is.na(targValue)),
-                         fill = "gray40")
+                      label = plotLabels[1])
 
 
   bottomLeft <-patchComparisonPlts[[2]] +
     # cowplot::theme_nothing() +
+    ggplot2::theme(plot.margin = ggplot2::margin(-20,-100,30,-100)) +
+    ggplot2::geom_raster(data = combinedValues %>%
+                           dplyr::filter(!is.na(refValue) & is.na(targValue)),
+                         fill = "gray40") +
     ggplot2::annotate(x = label_x,
                       y = label_y,
                       geom = "text",
                       size = labelSize,
-                      label = plotLabels[2]) +
-    ggplot2::theme(plot.margin = ggplot2::margin(-20,-100,30,-100)) +
-    ggplot2::geom_raster(data = combinedValues %>%
-                           dplyr::filter(!is.na(refValue) & is.na(targValue)),
-                         fill = "gray40")
+                      label = plotLabels[2])
 
   middle <- patchComparisonPlts[[3]] -
     ggplot2::geom_raster(data = averageBinarized %>%

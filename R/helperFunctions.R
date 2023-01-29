@@ -1,5 +1,28 @@
-# helper function for x3pListPlot. Rotates a surface matrix, but doesn't crop
-# back to the original surface matrix's dimensions.
+# @name rotateSurfaceMatrix
+
+rotateSurfaceMatrix <- function(surfaceMat,
+                                theta = 0,
+                                interpolation = 0){
+  surfaceMatFake <- (surfaceMat*10^5) + 1 #scale and shift all non-NA pixels up 1 (meter)
+  # imFakeRotated <- :bilinearInterpolation(imFake,theta)
+  surfaceMatFakeRotated <- surfaceMatFake %>%
+    imager::as.cimg() %>%
+    imager::imrotate(angle = theta,
+                     interpolation = interpolation, #linear interpolation,
+                     cx = floor(nrow(.)/2), #imager treats the rows as the "x" axis of an image
+                     cy = floor(ncol(.)/2),
+                     boundary = 0) %>% #pad boundary with 0s (dirichlet condition)
+    as.matrix()
+
+  surfaceMatFakeRotated[surfaceMatFakeRotated == 0] <- NA
+  #shift all of the legitimate pixels back down by 1:
+  surfaceMatRotated <- (surfaceMatFakeRotated - 1)/(10^5)
+
+  return(surfaceMatRotated)
+}
+
+# Rotates a surface matrix, but doesn't crop back to the original surface
+# matrix's dimensions.
 rotateSurfaceMatrix_noCrop <- function(surfaceMat,
                                        theta = 0,
                                        interpolation = 0){
