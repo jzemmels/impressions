@@ -36,7 +36,7 @@ x3pPlot <- function(...,
                     type = "faceted",
                     legend.quantiles = c(0,.01,.25,.5,.75,.99,1),
                     height.quantiles = c(0,.01,.025,.1,.25,.5,.75,0.9,.975,.99,1),
-                    height.colors = rev(c('#7f3b08','#b35806','#e08214','#fdb863','#fee0b6','#f7f7f7','#d8daeb','#b2abd2','#8073ac','#542788','#2d004b')),
+                    height.colors = c('#2d004b','#542788','#8073ac','#b2abd2','#d8daeb','#f7f7f7','#fee0b6','#fdb863','#e08214','#b35806','#7f3b08'),
                     na.value = "gray65",
                     legendLength = grid::unit(3,"in")){
 
@@ -56,6 +56,7 @@ x3pPlot <- function(...,
 
                                        x3p$header.info$incrementX <- 1
                                        x3p$header.info$incrementY <- 1
+                                       x3p$mask <- NULL
 
                                        x3p %>%
                                          x3ptools::x3p_to_df() %>%
