@@ -8,7 +8,7 @@ scans}
 x3p_comparisonPlot(
   x3p1,
   x3p2,
-  thresholdMultiplier = 1,
+  threshold = 1e-06,
   plotLabels = c("x3p1", "x3p2", "Element-wise Average", "x3p1 diff.", "x3p2 diff."),
   labelSize = 4,
   label_x = ncol(x3p1$surface.matrix)/2,
@@ -25,9 +25,11 @@ x3p_comparisonPlot(
 
 \item{x3p2}{another x3p object}
 
-\item{thresholdMultiplier}{the default filtering threshold is equal to the
-standard deviation of the joint x3p1 and x3p2 surface matrix values. This
-argument can be used to scale this threshold}
+\item{threshold}{the default filtering threshold. Defaults to a scalar (1
+micron = 1e-6 meters), but can also be set to a scalar-valued function that
+takes x3p1 and x3p2 as arguments. For example, threshold =
+impressions::x3p_sd will use the joint standard deviation of x3p1 and x3p2
+as the threshold.}
 
 \item{plotLabels}{a character vector of five elements that will display as
 labels on each plot}

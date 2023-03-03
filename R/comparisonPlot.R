@@ -17,9 +17,11 @@
 #'
 #' @param x3p1 an x3p object
 #' @param x3p2 another x3p object
-#' @param thresholdMultiplier the default filtering threshold is equal to the
-#'   standard deviation of the joint x3p1 and x3p2 surface matrix values. This
-#'   argument can be used to scale this threshold
+#' @param threshold the default filtering threshold. Defaults to a scalar (1
+#'   micron = 1e-6 meters), but can also be set to a scalar-valued function that
+#'   takes x3p1 and x3p2 as arguments. For example, threshold =
+#'   impressions::x3p_sd will use the joint standard deviation of x3p1 and x3p2
+#'   as the threshold.
 #' @param plotLabels a character vector of five elements that will display as
 #'   labels on each plot
 #' @param labelSize font size for the plot labels
@@ -53,7 +55,7 @@
 #' @export
 x3p_comparisonPlot <- function(x3p1,
                                x3p2,
-                               threshold = 1,
+                               threshold = 1e-6,
                                plotLabels = c("x3p1","x3p2",
                                              "Element-wise Average",
                                              "x3p1 diff.","x3p2 diff."),
@@ -82,8 +84,12 @@ x3p_comparisonPlot <- function(x3p1,
   # in the foot if I ever try to further develop upon these functions, but oh
   # well.
 
-  # cutoffThresh <- x3p_sd(x3p1,x3p2)*thresholdMultiplier
-  cutoffThresh <- threshold
+  if(is.function(threshold)){
+    cutoffThresh <- threshold(x3p1,x3p2)
+  }
+  else{
+    cutoffThresh <- threshold
+  }
 
   x3pAveraged <- x3p_filter(x3p = x3p_elemAverage(x3p1,x3p2),
                             cond = function(x,y,thresh) abs(y) <= thresh,
