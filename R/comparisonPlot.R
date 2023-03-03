@@ -53,7 +53,7 @@
 #' @export
 x3p_comparisonPlot <- function(x3p1,
                                x3p2,
-                               thresholdMultiplier = 1,
+                               threshold = 1,
                                plotLabels = c("x3p1","x3p2",
                                              "Element-wise Average",
                                              "x3p1 diff.","x3p2 diff."),
@@ -82,7 +82,8 @@ x3p_comparisonPlot <- function(x3p1,
   # in the foot if I ever try to further develop upon these functions, but oh
   # well.
 
-  cutoffThresh <- x3p_sd(x3p1,x3p2)*thresholdMultiplier
+  # cutoffThresh <- x3p_sd(x3p1,x3p2)*thresholdMultiplier
+  cutoffThresh <- threshold
 
   x3pAveraged <- x3p_filter(x3p = x3p_elemAverage(x3p1,x3p2),
                             cond = function(x,y,thresh) abs(y) <= thresh,
