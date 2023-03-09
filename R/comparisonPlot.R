@@ -55,7 +55,7 @@
 #' @export
 x3p_comparisonPlot <- function(x3p1,
                                x3p2,
-                               threshold = 1e-6,
+                               threshold = 1,
                                plotLabels = c("x3p1","x3p2",
                                              "Element-wise Average",
                                              "x3p1 diff.","x3p2 diff."),
