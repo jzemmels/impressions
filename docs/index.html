@@ -14,10 +14,10 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Diagnose cartridge case comparison algorithms">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Diagnose cartridge case comparison algorithms">
 <meta property="og:description" content="Explain and diagnose algorithms to compare cartridge case impressions.">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -59,76 +59,53 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header">
-<img src="logo.png" class="logo" alt=""><h1 id="impressions-">impressions
-<a class="anchor" aria-label="anchor" href="#impressions-"></a>
+<img src="logo.png" class="logo" alt=""><h1 id="impressions-">impressions <a class="anchor" aria-label="anchor" href="#impressions-"></a>
 </h1>
 </div>
 <!-- badges: start -->
 <!-- badges: end -->
-<p>An R package for diagnosing cartridge case impression comparison
-algorithms.</p>
+<p>An R package for diagnosing cartridge case impression comparison algorithms.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install the development version of impressions from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"jzemmels/impressions"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"jzemmels/impressions"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="visual-diagnostics">Visual Diagnostics<a class="anchor" aria-label="anchor" href="#visual-diagnostics"></a>
 </h2>
-<p>As an example, consider two cartridge cases fired from the same Ruger
-SR9 semiautomatic 9-mm handgun. Learn more about the collection of these
-cartridge cases <a href="https://www.ojp.gov/pdffiles1/nij/249874.pdf" class="external-link">here</a>. The
-cartridge cases are uniquely identified as “K013sA1” and “K013sA2.” We
-assume that the markings on these cartridge cases left by the handgun
-during the firing process are similar.</p>
+<p>As an example, consider two cartridge cases fired from the same Ruger SR9 semiautomatic 9-mm handgun. Learn more about the collection of these cartridge cases <a href="https://www.ojp.gov/pdffiles1/nij/249874.pdf" class="external-link">here</a>. The cartridge cases are uniquely identified as “K013sA1” and “K013sA2.” We assume that the markings on these cartridge cases left by the handgun during the firing process are similar.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">impressions</span><span class="op">)</span>
-
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">cmcR</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"K013sA1"</span>,<span class="st">"K013sA2"</span><span class="op">)</span></code></pre></div>
-<p>Below is a visual of the two cartridge case scans. Note that these
-scans have already undergone some preprocessing to emphasize the breech
-face impression markings. The similarity between these cartridge cases
-is not immediately apparent. The color scheme of these plots is chosen
-to highlight extreme values (far from the median value) in the scan,
-meaning small, local similarities are not highlighted. We can use visual
-diagnostics available in the <code>impressions</code> package to
-understand the similarity between these scans.</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">impressions</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">cmcR</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"K013sA1"</span>,<span class="st">"K013sA2"</span><span class="op">)</span></span></code></pre></div>
+<p>Below is a visual of the two cartridge case scans. Note that these scans have already undergone some preprocessing to emphasize the breech face impression markings. The similarity between these cartridge cases is not immediately apparent. The color scheme of these plots is chosen to highlight extreme values (far from the median value) in the scan, meaning small, local similarities are not highlighted. We can use visual diagnostics available in the <code>impressions</code> package to understand the similarity between these scans.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/x3pPlot.html">x3pPlot</a></span><span class="op">(</span><span class="va">K013sA1</span>,<span class="va">K013sA2</span>,
-        x3pNames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Scan A"</span>,<span class="st">"Scan B"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/x3pPlot.html">x3pPlot</a></span><span class="op">(</span><span class="va">K013sA1</span>,<span class="va">K013sA2</span>,</span>
+<span>        x3pNames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Scan A"</span>,<span class="st">"Scan B"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-2-1.png" width="100%"></p>
 <div class="section level3">
 <h3 id="comparison-plot">Comparison Plot<a class="anchor" aria-label="anchor" href="#comparison-plot"></a>
 </h3>
-<p>The comparison plot is a powerful tool to separate two cartridge case
-scans into “similar” and “different” regions. First, we attempt to align
-these two scans by rotating and translating K013sA2 to match K013sA1. We
-use the <code><a href="https://rdrr.io/pkg/cmcR/man/comparison_allTogether.html" class="external-link">cmcR::comparison_allTogether()</a></code> function to estimate
-this alignment. For the sake of this example, we’ll consider K013sA2
-rotated by 3 degrees and translated to maximize the cross-correlation
-function with K013sA1.</p>
+<p>The comparison plot is a powerful tool to separate two cartridge case scans into “similar” and “different” regions. First, we attempt to align these two scans by rotating and translating K013sA2 to match K013sA1. We use the <code><a href="https://rdrr.io/pkg/cmcR/man/comparison_allTogether.html" class="external-link">cmcR::comparison_allTogether()</a></code> function to estimate this alignment. For the sake of this example, we’ll consider K013sA2 rotated by 3 degrees and translated to maximize the cross-correlation function with K013sA1.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">comparisonData</span> <span class="op">&lt;-</span> <span class="fu">cmcR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/cmcR/man/comparison_allTogether.html" class="external-link">comparison_allTogether</a></span><span class="op">(</span><span class="va">K013sA1</span>,<span class="va">K013sA2</span>,
-                                               theta <span class="op">=</span> <span class="fl">3</span>,
-                                               numCells <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>,
-                                               maxMissingProp <span class="op">=</span> <span class="fl">.99</span>,
-                                               sideLengthMultiplier <span class="op">=</span> <span class="fl">1.1</span>,
-                                               returnX3Ps <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p>The resulting <code>comparisonData</code> data frame contains a
-transformed version of scan K013sA2 after rotating/translating to align
-with K013sA1. We’ll pass this transformed scan to the <code>x3p2</code>
-argument.</p>
+<code class="sourceCode R"><span><span class="va">comparisonData</span> <span class="op">&lt;-</span> <span class="fu">cmcR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/cmcR/man/comparison_allTogether.html" class="external-link">comparison_allTogether</a></span><span class="op">(</span><span class="va">K013sA1</span>,<span class="va">K013sA2</span>,</span>
+<span>                                               theta <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>                                               numCells <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>,</span>
+<span>                                               maxMissingProp <span class="op">=</span> <span class="fl">.99</span>,</span>
+<span>                                               sideLengthMultiplier <span class="op">=</span> <span class="fl">1.1</span>,</span>
+<span>                                               returnX3Ps <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>The resulting <code>comparisonData</code> data frame contains a transformed version of scan K013sA2 after rotating/translating to align with K013sA1. We’ll pass this transformed scan to the <code>x3p2</code> argument.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/x3p_comparisonPlot.html">x3p_comparisonPlot</a></span><span class="op">(</span>x3p1 <span class="op">=</span> <span class="va">comparisonData</span><span class="op">$</span><span class="va">cellHeightValues</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,
-                   x3p2 <span class="op">=</span> <span class="va">comparisonData</span><span class="op">$</span><span class="va">alignedTargetCell</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,
-                   legendLength <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">6</span>,<span class="st">"in"</span><span class="op">)</span>,
-                   legendQuantiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">.01</span>,<span class="fl">.05</span>,<span class="fl">.5</span>,<span class="fl">.95</span>,<span class="fl">.99</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/x3p_comparisonPlot.html">x3p_comparisonPlot</a></span><span class="op">(</span>x3p1 <span class="op">=</span> <span class="va">comparisonData</span><span class="op">$</span><span class="va">cellHeightValues</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>                   x3p2 <span class="op">=</span> <span class="va">comparisonData</span><span class="op">$</span><span class="va">alignedTargetCell</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>                   legendLength <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">6</span>,<span class="st">"in"</span><span class="op">)</span>,</span>
+<span>                   legendQuantiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">.01</span>,<span class="fl">.05</span>,<span class="fl">.5</span>,<span class="fl">.95</span>,<span class="fl">.99</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="100%"></p>
 </div>
 </div>
@@ -172,16 +149,12 @@ argument.</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by <a href="https://jzemmels.github.io/" class="external-link">Joseph
-Zemmels</a>, <a href="https://github.com/heike" class="external-link">Heike Hofmann</a>,
-<a href="https://srvanderplas.netlify.app/" class="external-link">Susan VanderPlas</a>,
-<a href="https://forensicstats.org/" class="external-link">CSAFE</a>.</p>
+<p>Developed by <a href="https://jzemmels.github.io/" class="external-link">Joseph Zemmels</a>, <a href="https://github.com/heike" class="external-link">Heike Hofmann</a>, <a href="https://srvanderplas.netlify.app/" class="external-link">Susan VanderPlas</a>, <a href="https://forensicstats.org/" class="external-link">CSAFE</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
     </footer>
