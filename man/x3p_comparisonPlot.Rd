@@ -8,8 +8,9 @@ scans}
 x3p_comparisonPlot(
   x3p1,
   x3p2,
-  threshold = 1e-06,
+  threshold = 1,
   plotLabels = c("x3p1", "x3p2", "Element-wise Average", "x3p1 diff.", "x3p2 diff."),
+  showOutlines = TRUE,
   labelSize = 4,
   label_x = ncol(x3p1$surface.matrix)/2,
   label_y = nrow(x3p1$surface.matrix)/2,
@@ -34,6 +35,10 @@ as the threshold.}
 \item{plotLabels}{a character vector of five elements that will display as
 labels on each plot}
 
+\item{showOutlines}{boolean value of whether to show outline around the
+filtered elements in the element-wise average and difference plots. See
+notes for more details}
+
 \item{labelSize}{font size for the plot labels}
 
 \item{label_x}{horizontal location of the plot labels}
@@ -57,6 +62,22 @@ within the breaks argument of the ggplot2::scale_fill_gradientn function}
 \description{
 Plot filtered element-wise average and differences for two cartridge case
 scans
+}
+\note{
+The showOutlines argument set to FALSE sidesteps a computation of
+  outlines for the filtered regions in the comparison plot. This is because
+  some systems, particularly Linux systems, may not have the necessary
+  libraries required to compute the outline installed by default.
+  Specifically, the function to compute the outlines relies on an R package
+  called rgeos (https://cran.r-project.org/web/packages/rgeos/index.html),
+  which is an API to the geos geometry engine (https://libgeos.org/). Linux
+  users need to install geos to install rgeos to compute the outline. See
+  this post for more info:
+  https://stackoverflow.com/questions/53389181/installing-the-r-package-rgeos-on-linux-geos-config-not-found-or-not-executab
+  Alternatively, you can skip the outline calculation all together using
+  this showOutlines argument at the expense of not seeing the region
+  outlines, which are more a nice visual aid than a necessary component of
+  the plot.
 }
 \examples{
 data("K013sA1","K013sA2")

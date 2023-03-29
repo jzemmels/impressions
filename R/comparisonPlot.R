@@ -24,6 +24,9 @@
 #'   as the threshold.
 #' @param plotLabels a character vector of five elements that will display as
 #'   labels on each plot
+#' @param showOutlines boolean value of whether to show outline around the
+#'   filtered elements in the element-wise average and difference plots. See
+#'   notes for more details
 #' @param labelSize font size for the plot labels
 #' @param label_x horizontal location of the plot labels
 #' @param label_y vertical location of the plot labels
@@ -39,6 +42,21 @@
 #'
 #' @seealso dplyr::guide_colorbar
 #' @importFrom dplyr select
+#'
+#' @note The showOutlines argument set to FALSE sidesteps a computation of
+#'   outlines for the filtered regions in the comparison plot. This is because
+#'   some systems, particularly Linux systems, may not have the necessary
+#'   libraries required to compute the outline installed by default.
+#'   Specifically, the function to compute the outlines relies on an R package
+#'   called rgeos (https://cran.r-project.org/web/packages/rgeos/index.html),
+#'   which is an API to the geos geometry engine (https://libgeos.org/). Linux
+#'   users need to install geos to install rgeos to compute the outline. See
+#'   this post for more info:
+#'   https://stackoverflow.com/questions/53389181/installing-the-r-package-rgeos-on-linux-geos-config-not-found-or-not-executab
+#'   Alternatively, you can skip the outline calculation all together using
+#'   this showOutlines argument at the expense of not seeing the region
+#'   outlines, which are more a nice visual aid than a necessary component of
+#'   the plot.
 #'
 #' @examples
 #' data("K013sA1","K013sA2")
@@ -59,6 +77,7 @@ x3p_comparisonPlot <- function(x3p1,
                                plotLabels = c("x3p1","x3p2",
                                              "Element-wise Average",
                                              "x3p1 diff.","x3p2 diff."),
+                               showOutlines = TRUE,
                                labelSize = 4,
                                label_x = ncol(x3p1$surface.matrix)/2,
                                label_y = nrow(x3p1$surface.matrix)/2,
@@ -190,15 +209,9 @@ x3p_comparisonPlot <- function(x3p1,
 
   patchComparisonPlts <- c(ret,list(pltLegend))
 
-  # next, we use a labeling algorithm to identify the borders of the filtered
-  # regions and plot these borders on top of the filtered plots created in the
-  # ret object
-
   averageBinarized <- x3pAveraged %>%
     x3p_to_dataFrame(preserveResolution = FALSE) %>%
     dplyr::mutate(value = (abs(c({x3p1$surface.matrix - x3p2$surface.matrix})) > cutoffThresh))
-
-  outline <- filterBoundaries(averageBinarized)
 
   combinedValues <-  x3p1 %>%
     impressions::x3p_to_dataFrame() %>%
@@ -209,7 +222,6 @@ x3p_comparisonPlot <- function(x3p1,
                      by = c("x","y"))
 
   topLeft <- patchComparisonPlts[[1]] +
-    # cowplot::theme_nothing() +
     ggplot2::theme(plot.margin = ggplot2::margin(0,0,5,0)) +
     ggplot2::geom_raster(data = combinedValues %>%
                            dplyr::filter(is.na(refValue) & !is.na(targValue)),
@@ -221,8 +233,7 @@ x3p_comparisonPlot <- function(x3p1,
                       label = plotLabels[1])
 
 
-  bottomLeft <-patchComparisonPlts[[2]] +
-    # cowplot::theme_nothing() +
+  bottomLeft <- patchComparisonPlts[[2]] +
     ggplot2::theme(plot.margin = ggplot2::margin(-20,-100,30,-100)) +
     ggplot2::geom_raster(data = combinedValues %>%
                            dplyr::filter(!is.na(refValue) & is.na(targValue)),
@@ -243,12 +254,7 @@ x3p_comparisonPlot <- function(x3p1,
                       geom = "text",
                       size = labelSize,
                       label = plotLabels[3]) +
-    ggplot2::theme(plot.margin = ggplot2::margin(0,25,0,25)) +
-    ggplot2::geom_path(data = outline,  color = "grey40",
-                       ggplot2::aes(x=long,y=lat,group=group),
-                       colour = "gray40",
-                       inherit.aes = FALSE,
-                       size = .2)
+    ggplot2::theme(plot.margin = ggplot2::margin(0,25,0,25))
 
   topRight <- patchComparisonPlts[[4]] -
     ggplot2::geom_raster(data = averageBinarized %>%
@@ -260,12 +266,7 @@ x3p_comparisonPlot <- function(x3p1,
                       geom = "text",
                       size = labelSize,
                       label = plotLabels[4]) +
-    ggplot2::theme(plot.margin = ggplot2::margin(0,0,5,0))+
-    ggplot2::geom_path(data = outline,  color = "grey40",
-                       ggplot2::aes(x=long,y=lat,group=group),
-                       colour = "gray40",
-                       inherit.aes = FALSE,
-                       size = .1)
+    ggplot2::theme(plot.margin = ggplot2::margin(0,0,5,0))
 
   bottomRight <- patchComparisonPlts[[5]] -
     ggplot2::geom_raster(data = averageBinarized %>%
@@ -277,12 +278,37 @@ x3p_comparisonPlot <- function(x3p1,
                       geom = "text",
                       size = labelSize,
                       label = plotLabels[5]) +
-    ggplot2::theme(plot.margin = ggplot2::margin(-20,-100,30,-100))+
-    ggplot2::geom_path(data = outline, color = "grey40",
-                       ggplot2::aes(x=long,y=lat,group=group),
-                       colour = "gray40",
-                       inherit.aes = FALSE,
-                       size = .1)
+    ggplot2::theme(plot.margin = ggplot2::margin(-20,-100,30,-100))
+
+
+  # An error occurs here on some systems that don't have the libgeos library
+  # installed, which is an open source geometry engine (https://libgeos.org/)
+  if(showOutlines){
+
+    outline <- filterBoundaries(averageBinarized)
+
+    middle <- middle +
+      ggplot2::geom_path(data = outline,  color = "grey40",
+                         ggplot2::aes(x=long,y=lat,group=group),
+                         colour = "gray40",
+                         inherit.aes = FALSE,
+                         size = .2)
+
+    topRight <- topRight +
+      ggplot2::geom_path(data = outline,  color = "grey40",
+                         ggplot2::aes(x=long,y=lat,group=group),
+                         colour = "gray40",
+                         inherit.aes = FALSE,
+                         size = .1)
+
+    bottomRight <- bottomRight +
+      ggplot2::geom_path(data = outline, color = "grey40",
+                         ggplot2::aes(x=long,y=lat,group=group),
+                         colour = "gray40",
+                         inherit.aes = FALSE,
+                         size = .1)
+
+  }
 
   if(type == "faceted"){
 

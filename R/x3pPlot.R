@@ -130,7 +130,6 @@ x3pPlot <- function(...,
                             dplyr::select(-c(.data$x,.data$y)) %>%
                             dplyr::rename(x=.data$xnew,
                                           y=.data$ynew) %>%
-                            dplyr::mutate(value = .data$value - median(.data$value,na.rm = TRUE)) %>%
                             dplyr::mutate(x3p = rep(name,times = nrow(.)))
 
                           surfaceMat_df %>%

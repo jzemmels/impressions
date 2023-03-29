@@ -58,7 +58,7 @@
 #'                         thresh = x3p_sd(K013sA1))
 #'
 #' # this will replace all surface matrix values between -1 and 1 with 0
-#' filtered2 <- x3p_filter(K013sA1,cond = function(x) abs(x) > 1,replacement = 0)
+#' filtered2 <- x3p_filter(K013sA1,cond = function(x) abs(x) < 1,replacement = 0)
 #'
 #' # exaggerated cropping for the sake of an example
 #' cropped <- x3p_cropWS(K013sA1,croppingThresh = 100)
