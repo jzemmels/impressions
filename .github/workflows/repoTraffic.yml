@@ -35,9 +35,9 @@ jobs:
       env:
         API_TOKEN_GITHUB: ${{ secrets.TRAFFIC_ACTION_TOKEN }}
       with:
-        source_file: 'traffic'
+        source_file: 'traffic/clones.csv traffic/views.csv'
         destination_repo: 'jzemmels/trafficMonitor'
-        destination_folder: 'impressions'
+        destination_folder: 'impressions-traffic'
         user_email: 'jzemmels@iastate.edu'
         user_name: 'jzemmels'
         commit_message: 'Push impressions traffic data'
