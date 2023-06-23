@@ -1,5 +1,4 @@
-on:
-  push:
+on: [push]
 worflow_call:
 #   schedule:
 #     # runs once a week on sunday
