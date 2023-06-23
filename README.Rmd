@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # impressions <img src="man/figures/logo.png" align="right" height="139" />
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/jzemmels/impressions/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jzemmels/impressions/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 An R package for diagnosing cartridge case impression comparison algorithms.
