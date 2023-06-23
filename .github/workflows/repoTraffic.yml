@@ -1,5 +1,5 @@
 on: [push]
-worflow_call:
+workflow_call:
 #   schedule:
 #     # runs once a week on sunday
 #     - cron: "55 23 * * 0"
