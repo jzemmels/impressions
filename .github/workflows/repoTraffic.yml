@@ -1,4 +1,4 @@
-# on:
+on: [push]
 #   schedule:
 #     # runs once a week on sunday
 #     - cron: "55 23 * * 0"
