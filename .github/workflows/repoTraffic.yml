@@ -1,11 +1,4 @@
-on:
-  workflow_call:
-    secrets:
-      envPAT:
-        required: true
-#   schedule:
-#     # runs once a week on sunday
-#     - cron: "55 23 * * 0"
+on: [push]
 
 jobs:
   # This workflow contains a single job called "traffic"
