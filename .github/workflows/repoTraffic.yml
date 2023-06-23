@@ -1,7 +1,7 @@
-on:
-  schedule:
-    # runs once a week on sunday
-    - cron: "55 23 * * 0"
+on: [push]
+  # schedule:
+  #   # runs once a week on sunday
+  #   - cron: "55 23 * * 0"
 
 jobs:
   # This workflow contains a single job called "traffic"
@@ -30,3 +30,14 @@ jobs:
         message: "GitHub traffic"
         add: "./traffic/*"
         ref: "main"  # commits to branch "traffic"
+    - name: Pushes test file
+      uses: dmnemec/copy_file_to_another_repo_action@main
+      env:
+        API_TOKEN_GITHUB: ${{ secrets.TRAFFIC_ACTION_TOKEN }}
+      with:
+        source_file: 'traffic'
+        destination_repo: 'jzemmels/trafficMonitor'
+        destination_folder: 'impressions'
+        user_email: 'jzemmels@iastate.edu'
+        user_name: 'jzemmels'
+        commit_message: 'Push impressions traffic data'
