@@ -25,6 +25,12 @@ scans"><meta property="og:image" content="/logo.png"><!-- mathjax --><script src
       <ul class="navbar-nav me-auto"><li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/x3pPlot-function.html">Using and tweaking x3pPlot()</a>
+  </div>
+</li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
@@ -51,8 +57,9 @@ scans</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">x3p_comparisonPlot</span><span class="op">(</span></span>
 <span>  <span class="va">x3p1</span>,</span>
 <span>  <span class="va">x3p2</span>,</span>
-<span>  threshold <span class="op">=</span> <span class="fl">1e-06</span>,</span>
+<span>  threshold <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  plotLabels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x3p1"</span>, <span class="st">"x3p2"</span>, <span class="st">"Element-wise Average"</span>, <span class="st">"x3p1 diff."</span>, <span class="st">"x3p2 diff."</span><span class="op">)</span>,</span>
+<span>  showOutlines <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  labelSize <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  label_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x3p1</span><span class="op">$</span><span class="va">surface.matrix</span><span class="op">)</span><span class="op">/</span><span class="fl">2</span>,</span>
 <span>  label_y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">x3p1</span><span class="op">$</span><span class="va">surface.matrix</span><span class="op">)</span><span class="op">/</span><span class="fl">2</span>,</span>
@@ -85,6 +92,12 @@ as the threshold.</p></dd>
 <dt>plotLabels</dt>
 <dd><p>a character vector of five elements that will display as
 labels on each plot</p></dd>
+
+
+<dt>showOutlines</dt>
+<dd><p>boolean value of whether to show outline around the
+filtered elements in the element-wise average and difference plots. See
+notes for more details</p></dd>
 
 
 <dt>labelSize</dt>
@@ -123,6 +136,23 @@ patchwork::inset_element function</p></dd>
 within the breaks argument of the ggplot2::scale_fill_gradientn function</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
+    <p>The showOutlines argument set to FALSE sidesteps a computation of
+  outlines for the filtered regions in the comparison plot. This is because
+  some systems, particularly Linux systems, may not have the necessary
+  libraries required to compute the outline installed by default.
+  Specifically, the function to compute the outlines relies on an R package
+  called rgeos (https://cran.r-project.org/web/packages/rgeos/index.html),
+  which is an API to the geos geometry engine (https://libgeos.org/). Linux
+  users need to install geos to install rgeos to compute the outline. See
+  this post for more info:
+  https://stackoverflow.com/questions/53389181/installing-the-r-package-rgeos-on-linux-geos-config-not-found-or-not-executab
+  Alternatively, you can skip the outline calculation all together using
+  this showOutlines argument at the expense of not seeing the region
+  outlines, which are more a nice visual aid than a necessary component of
+  the plot.</p>
+    </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>dplyr::guide_colorbar</p></div>

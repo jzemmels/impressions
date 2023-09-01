@@ -2,42 +2,55 @@
 % Please edit documentation in R/x3pPlot.R
 \name{x3pPlot}
 \alias{x3pPlot}
+\alias{x3p_plot}
 \title{Plot a list of x3ps}
 \usage{
 x3pPlot(
   ...,
-  x3pNames = NULL,
-  type = "faceted",
-  legend.quantiles = c(0, 0.01, 0.25, 0.5, 0.75, 0.99, 1),
-  height.quantiles = c(0, 0.01, 0.025, 0.1, 0.25, 0.5, 0.75, 0.9, 0.975, 0.99, 1),
+  x3p.names = NULL,
+  output = "faceted",
   height.colors = c("#2d004b", "#542788", "#8073ac", "#b2abd2", "#d8daeb", "#f7f7f7",
     "#fee0b6", "#fdb863", "#e08214", "#b35806", "#7f3b08"),
+  height.quantiles = c(0, 0.01, 0.025, 0.1, 0.25, 0.5, 0.75, 0.9, 0.975, 0.99, 1),
+  legend.quantiles = c(0, 0.01, 0.25, 0.5, 0.75, 0.99, 1),
   na.value = "gray65",
-  legendLength = grid::unit(3, "in")
+  legend.length = grid::unit(3, "in")
+)
+
+x3p_plot(
+  ...,
+  x3p.names = NULL,
+  output = "faceted",
+  height.colors = c("#2d004b", "#542788", "#8073ac", "#b2abd2", "#d8daeb", "#f7f7f7",
+    "#fee0b6", "#fdb863", "#e08214", "#b35806", "#7f3b08"),
+  height.quantiles = c(0, 0.01, 0.025, 0.1, 0.25, 0.5, 0.75, 0.9, 0.975, 0.99, 1),
+  legend.quantiles = c(0, 0.01, 0.25, 0.5, 0.75, 0.99, 1),
+  na.value = "gray65",
+  legend.length = grid::unit(3, "in")
 )
 }
 \arguments{
 \item{...}{one or more x3p objects}
 
-\item{x3pNames}{character vector containing names of each x3p object}
+\item{x3p.names}{character vector containing names of each x3p object}
 
-\item{type}{dictates whether one plot faceted by surface matrix or a list of
+\item{output}{dictates whether one plot faceted by surface matrix or a list of
 plots per surface matrix is returned. The faceted plot will have a
 consistent height scale across all surface matrices.}
-
-\item{legend.quantiles}{vector of quantiles to be shown as tick marks on
-legend plot}
-
-\item{height.quantiles}{vector of quantiles associated with each color defined
-in the height.colors argument}
 
 \item{height.colors}{vector of colors to be passed to scale_fill_gradientn
 that dictates the height value colorscale}
 
+\item{height.quantiles}{vector of quantiles associated with each color defined
+in the height.colors argument}
+
+\item{legend.quantiles}{vector of quantiles to be shown as tick marks on
+legend plot}
+
 \item{na.value}{color to be used for NA values (passed to
 scale_fill_gradientn)}
 
-\item{legendLength}{length of the plot legend. Passed to the barwidth
+\item{legend.length}{length of the plot legend. Passed to the barheight
 argument of the ggplot2::guide_colorbar function}
 }
 \value{
@@ -52,5 +65,5 @@ Plots the surface matrices in a list of x3p objects. Either
 \examples{
 data("K013sA1","K013sA2")
 
-x3pPlot(K013sA1,K013sA2,x3pNames = c("Scan A","Scan B"))
+x3pPlot(K013sA1,K013sA2,x3p.names = c("Scan A","Scan B"))
 }
