@@ -33,8 +33,8 @@ data("K013sA2")
 ```
 
 First, let's make sure that we understand the basic functionality of `x3pPlot()`.
-This section will discuss how the arguments of `x3pPlot()` change the output, which expose some of the underlying `ggplot2` functionality.
-Those familiar with `ggplot2` can ignore these arguments, and consequently this section, by simply adding (`+`) desired changes to the `ggplot2` object returned by `x3pPlot()`.
+This section will discuss how the arguments of `x3pPlot()` expose some of the underlying `ggplot2` functionality to change the output.
+Experts of `ggplot2` can ignore these arguments by simply adding (`+`) desired changes to the `ggplot2` object returned by `x3pPlot()`.
 The sections after this one show how you can extend the functionality of `x3pPlot()` using `ggplot2`.
 
 The `x3pPlot` function takes as its first argument(s) a sequence or list of x3p objects.
